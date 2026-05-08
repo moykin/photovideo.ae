@@ -50,7 +50,8 @@ ENVEOF
 cat > tools/.env << 'ENVEOF'
 GOOGLE_CLIENT_ID=CHANGE_ME
 GOOGLE_CLIENT_SECRET=CHANGE_ME
-REDIRECT_URI=https://tools.photovideo.ae/auth/callback
+REDIRECT_URI=https://photovideo.ae/download/auth/callback
+ROOT_PATH=/download
 SECRET_KEY=CHANGE_ME_RANDOM_32_CHARS
 ENVEOF
 

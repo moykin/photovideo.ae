@@ -101,7 +101,7 @@ export function Header() {
                       <Settings className="h-4 w-4" /> Settings
                     </Link>
                     <a href={process.env.NEXT_PUBLIC_YT2GDRIVE_URL ?? 'http://localhost:8080'} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800" onClick={() => setDropdownOpen(false)}>
-                      <Download className="h-4 w-4" /> YT → Drive
+                      <Download className="h-4 w-4" /> YT Downloader
                     </a>
                     <hr className="my-1 border-gray-100 dark:border-gray-800" />
                     <button onClick={signOut} className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">

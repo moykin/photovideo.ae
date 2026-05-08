@@ -18,7 +18,7 @@ from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
-app = FastAPI()
+app = FastAPI(root_path=os.environ.get("ROOT_PATH", ""))
 app.add_middleware(
     SessionMiddleware,
     secret_key=os.environ.get("SECRET_KEY", secrets.token_hex(32)),
