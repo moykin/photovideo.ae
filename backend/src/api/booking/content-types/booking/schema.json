@@ -1,0 +1,58 @@
+{
+  "kind": "collectionType",
+  "collectionName": "bookings",
+  "info": {
+    "singularName": "booking",
+    "pluralName": "bookings",
+    "displayName": "Booking",
+    "description": "Booking requests between clients and photographers/videographers"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "client": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "bookingsAsClient"
+    },
+    "provider": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "bookingsAsProvider"
+    },
+    "serviceType": {
+      "type": "enumeration",
+      "enum": ["photography", "videography", "both"],
+      "required": true
+    },
+    "eventType": { "type": "string", "required": true },
+    "eventDate": { "type": "datetime", "required": true },
+    "duration": { "type": "integer", "min": 1, "default": 2 },
+    "location": { "type": "string", "required": true },
+    "city": { "type": "string", "default": "Dubai" },
+    "agreedPrice": { "type": "decimal" },
+    "currency": {
+      "type": "enumeration",
+      "enum": ["AED", "USD"],
+      "default": "AED"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["pending", "confirmed", "in_progress", "completed", "cancelled", "rejected"],
+      "default": "pending"
+    },
+    "clientNotes": { "type": "text" },
+    "providerNotes": { "type": "text" },
+    "cancellationReason": { "type": "text" },
+    "review": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::review.review",
+      "mappedBy": "booking"
+    },
+    "referenceCode": { "type": "string", "unique": true }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "kind": "collectionType",
+  "collectionName": "portfolios",
+  "info": {
+    "singularName": "portfolio",
+    "pluralName": "portfolios",
+    "displayName": "Portfolio",
+    "description": "Portfolio items for photographers and videographers"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "title": { "type": "string", "required": true },
+    "description": { "type": "text", "maxLength": 2000 },
+    "coverImage": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "media": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": ["images", "videos"]
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "wedding",
+        "portrait",
+        "commercial",
+        "fashion",
+        "sports",
+        "event",
+        "landscape",
+        "street",
+        "product",
+        "real_estate",
+        "videography",
+        "other"
+      ],
+      "required": true,
+      "default": "other"
+    },
+    "tags": { "type": "json" },
+    "author": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "portfolios"
+    },
+    "views": { "type": "integer", "default": 0 },
+    "likes": { "type": "integer", "default": 0 },
+    "isFeatured": { "type": "boolean", "default": false },
+    "location": { "type": "string" },
+    "shootDate": { "type": "date" },
+    "cameraGear": { "type": "string" }
+  }
+}

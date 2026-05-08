@@ -1,0 +1,36 @@
+{
+  "name": "photovideo-backend",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Strapi backend for photovideo.ae",
+  "scripts": {
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "build": "strapi build",
+    "strapi": "strapi"
+  },
+  "dependencies": {
+    "@strapi/plugin-users-permissions": "^5.45.0",
+    "@strapi/provider-email-nodemailer": "^5.45.0",
+    "@strapi/provider-upload-aws-s3": "^5.45.0",
+    "@strapi/strapi": "^5.45.0",
+    "better-sqlite3": "^9.4.3",
+    "pg": "^8.11.3",
+    "esbuild": "^0.25.0",
+    "sharp": "^0.33.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.3",
+    "styled-components": "^6.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10"
+  },
+  "engines": {
+    "node": ">=18.0.0 <=22.x.x",
+    "npm": ">=6.0.0"
+  },
+  "strapi": {
+    "uuid": "photovideo-ae-strapi"
+  }
+}

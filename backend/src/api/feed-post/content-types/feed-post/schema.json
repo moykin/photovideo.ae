@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "feed_posts",
+  "info": {
+    "singularName": "feed-post",
+    "pluralName": "feed-posts",
+    "displayName": "Feed Post",
+    "description": "Social feed posts - photographers share their work"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "caption": { "type": "text", "maxLength": 2200 },
+    "media": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": ["images", "videos"]
+    },
+    "author": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "feedPosts"
+    },
+    "tags": { "type": "json" },
+    "category": {
+      "type": "enumeration",
+      "enum": ["work", "behind_scenes", "tip", "announcement", "travel"],
+      "default": "work"
+    },
+    "likes": { "type": "integer", "default": 0 },
+    "commentsCount": { "type": "integer", "default": 0 },
+    "location": { "type": "string" },
+    "isFeatured": { "type": "boolean", "default": false },
+    "likedBy": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user"
+    }
+  }
+}

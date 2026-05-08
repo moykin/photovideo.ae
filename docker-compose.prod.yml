@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: photovideo_db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME:-photovideo}
+      POSTGRES_USER: ${DB_USER:-strapi}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER:-strapi} -d ${DB_NAME:-photovideo}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  strapi:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: photovideo_strapi
+    restart: always
+    env_file: ./backend/.env
+    environment:
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: ${DB_NAME:-photovideo}
+      DATABASE_USERNAME: ${DB_USER:-strapi}
+      DATABASE_PASSWORD: ${DB_PASSWORD}
+      NODE_ENV: production
+    ports:
+      - '127.0.0.1:1337:1337'
+    volumes:
+      - strapi_uploads:/app/public/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: photovideo_frontend
+    restart: always
+    env_file: ./frontend/.env.production
+    ports:
+      - '127.0.0.1:3000:3000'
+    depends_on:
+      - strapi
+
+  yt2gdrive:
+    build:
+      context: ./tools
+    container_name: photovideo_yt2gdrive
+    restart: always
+    env_file: ./tools/.env
+    ports:
+      - '127.0.0.1:8080:8080'
+
+volumes:
+  postgres_data:
+  strapi_uploads:

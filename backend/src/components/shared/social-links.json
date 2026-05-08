@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_shared_social_links",
+  "info": {
+    "displayName": "Social Links",
+    "icon": "link",
+    "description": "Social media profile links"
+  },
+  "options": {},
+  "attributes": {
+    "instagram": { "type": "string" },
+    "facebook": { "type": "string" },
+    "tiktok": { "type": "string" },
+    "youtube": { "type": "string" },
+    "twitter": { "type": "string" },
+    "website": { "type": "string" },
+    "linkedin": { "type": "string" },
+    "behance": { "type": "string" },
+    "vimeo": { "type": "string" },
+    "telegram": { "type": "string" },
+    "whatsapp": { "type": "string" }
+  }
+}

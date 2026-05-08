@@ -1,0 +1,39 @@
+# v1.0 — Alpine: нативные модули (esbuild, sharp) не устанавливались корректно на musl libc
+# v1.1 — Debian node:20: glibc совместим с pre-built бинарниками esbuild и sharp
+# v1.2 — Добавлен явный rebuild sharp для linux-arm64 (Apple Silicon Mac)
+# v1.3 — Sharp устанавливается через --os=linux --cpu=arm64, так как образ собирается
+#         на Mac (darwin/arm64) но ЗАПУСКАЕТСЯ на linux/arm64 внутри Docker.
+#         npm install без флагов устанавливает бинарник для darwin (хост),
+#         поэтому нужно явно указать целевую платформу контейнера.
+# v1.4 — То же самое для esbuild: "Failed to load native binding" во время сборки
+#         admin panel. Явная переустановка esbuild для linux/arm64.
+# v1.5 — Rollup (используется Vite для admin panel) имеет ту же проблему.
+#         npm не устанавливает @rollup/rollup-linux-arm64-gnu как optional dep
+#         из-за бага https://github.com/npm/cli/issues/4828. Явная установка.
+# v1.6 — @swc/core (Rust-компилятор JS/TS используемый Strapi) не устанавливает
+#         @swc/core-linux-arm64-gnu. npm ставит musl-версию вместо gnu (glibc).
+#         FROM node:20 — Debian/glibc, поэтому нужна -gnu версия, не -musl.
+
+FROM node:20
+
+WORKDIR /app
+
+# Копируем только package.json для кэширования слоя зависимостей
+COPY package*.json ./
+
+# Устанавливаем зависимости для linux-arm64:
+# 1. npm install — базовые зависимости
+# 2. npm install --os=linux --cpu=arm64 sharp — принудительно устанавливает
+#    правильный бинарник sharp для Linux ARM64 (не для macOS хоста)
+RUN npm install && \
+    npm install --os=linux --cpu=arm64 sharp && \
+    npm install --os=linux --cpu=arm64 esbuild && \
+    npm install @rollup/rollup-linux-arm64-gnu && \
+    npm install @swc/core-linux-arm64-gnu
+
+# Копируем код приложения
+COPY . .
+
+EXPOSE 1337
+
+CMD ["npm", "run", "develop"]

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YT Downloader</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d0f18; --s1: #161924; --s2: #1e2130; --s3: #262b3d;
+  --border: #2a3050; --text: #e2e6f3; --muted: #7a82a0;
+  --accent: #4f8ef7; --green: #34c77b; --red: #f75151; --r: 12px;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg); color: var(--text);
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; padding: 36px 16px 80px;
+}
+header {
+  width: 100%; max-width: 620px;
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px;
+}
+.logo { font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.logo-icon {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg,#4f8ef7,#34c77b);
+  border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: .9rem;
+}
+.user-chip { display: flex; align-items: center; gap: 8px; font-size: .82rem; color: var(--muted); }
+.user-chip strong { color: var(--text); }
+.btn-xs {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  padding: 4px 10px; border-radius: 7px; cursor: pointer; font-size: .78rem; transition: all .15s;
+}
+.btn-xs:hover { border-color: var(--red); color: var(--red); }
+.card {
+  background: var(--s1); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 28px; width: 100%; max-width: 620px; box-shadow: 0 4px 32px rgba(0,0,0,.4);
+}
+.url-wrap { position: relative; margin-bottom: 20px; }
+.url-input {
+  width: 100%; background: var(--bg); border: 1px solid var(--border);
+  color: var(--text); padding: 13px 44px 13px 16px;
+  border-radius: 10px; font-size: .95rem; outline: none; transition: border-color .15s;
+}
+.url-input:focus { border-color: var(--accent); }
+.url-input::placeholder { color: var(--muted); }
+.url-clear {
+  position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: var(--muted); cursor: pointer; display: none; font-size: 1rem;
+}
+.url-clear.show { display: block; }
+.mode-tabs {
+  display: flex; gap: 5px; margin-bottom: 20px;
+  background: var(--bg); border-radius: 10px; padding: 4px; border: 1px solid var(--border);
+}
+.tab {
+  flex: 1; padding: 9px; border-radius: 8px; border: none; cursor: pointer;
+  font-size: .87rem; font-weight: 500; transition: all .15s;
+  background: none; color: var(--muted);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.tab.active { background: var(--s2); color: var(--text); }
+.tab:hover:not(.active) { color: var(--text); }
+.cloud-section { margin-bottom: 20px; }
+.section-label {
+  font-size: .76rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--muted); margin-bottom: 10px;
+}
+.providers { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 16px; }
+.pcard {
+  background: var(--bg); border: 2px solid var(--border); border-radius: 10px;
+  padding: 14px 10px; cursor: pointer; transition: all .15s; text-align: center; position: relative;
+}
+.pcard:hover:not(.disabled) { border-color: var(--accent); }
+.pcard.sel { border-color: var(--accent); background: rgba(79,142,247,.08); }
+.pcard.disabled { opacity: .45; cursor: not-allowed; }
+.pcard-icon { font-size: 1.5rem; margin-bottom: 6px; display: flex; justify-content: center; }
+.pcard-name { font-size: .78rem; font-weight: 600; }
+.pcard-status { font-size: .7rem; color: var(--muted); margin-top: 2px; }
+.pcard.sel .pcard-status { color: var(--green); }
+.soon {
+  position: absolute; top: 6px; right: 6px;
+  background: var(--s3); color: var(--muted);
+  font-size: .6rem; font-weight: 700; padding: 2px 5px; border-radius: 5px;
+  text-transform: uppercase;
+}
+.connect-block {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 16px; display: flex; align-items: center;
+  justify-content: space-between; gap: 12px; margin-bottom: 16px;
+}
+.ci-title { font-size: .85rem; }
+.ci-sub { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+.ci-sub.ok { color: var(--green); }
+.btn-gsign {
+  background: #fff; color: #1f1f1f; border: none;
+  padding: 9px 14px; border-radius: 8px; font-size: .83rem; font-weight: 500;
+  cursor: pointer; display: flex; align-items: center; gap: 7px;
+  transition: box-shadow .15s; white-space: nowrap; flex-shrink: 0;
+}
+.btn-gsign:hover { box-shadow: 0 2px 10px rgba(0,0,0,.2); }
+.btn-disc {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  padding: 7px 12px; border-radius: 8px; font-size: .8rem; cursor: pointer;
+  transition: all .15s; flex-shrink: 0;
+}
+.btn-disc:hover { border-color: var(--red); color: var(--red); }
+.folder-trigger {
+  width: 100%; background: var(--bg); border: 1px solid var(--border);
+  color: var(--text); padding: 11px 14px; border-radius: 10px; font-size: .88rem;
+  text-align: left; cursor: pointer; display: flex; align-items: center; gap: 9px;
+  transition: border-color .15s; margin-bottom: 16px;
+}
+.folder-trigger:hover { border-color: var(--accent); }
+.ft-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn-main {
+  width: 100%; padding: 13px; border-radius: 10px; border: none;
+  font-size: .97rem; font-weight: 600; cursor: pointer;
+  background: linear-gradient(135deg,#4f8ef7,#3a7af0); color: #fff;
+  transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-main:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(79,142,247,.4); }
+.btn-main:active { transform: none; }
+.btn-main:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+.prog-wrap { margin-top: 22px; display: none; }
+.prog-bg { background: var(--s2); border-radius: 100px; height: 7px; overflow: hidden; margin-bottom: 10px; }
+.prog-fill {
+  height: 100%; border-radius: 100px; min-width: 4px;
+  background: linear-gradient(90deg,#4f8ef7,#6ec6ff); transition: width .4s ease;
+}
+.prog-fill.done { background: var(--green); }
+.prog-fill.err { background: var(--red); }
+.prog-msg { font-size: .85rem; color: var(--muted); text-align: center; }
+.result-box { margin-top: 16px; display: none; }
+.result-inner {
+  background: var(--s2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 18px; text-align: center;
+}
+.result-inner.ok { border-color: var(--green); }
+.result-inner.err { border-color: var(--red); }
+.ri-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.ri-name { font-weight: 600; margin-bottom: 14px; font-size: .9rem; word-break: break-all; }
+.ri-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.btn-dl {
+  background: var(--green); color: #fff; border: none;
+  padding: 9px 18px; border-radius: 8px; font-size: .85rem; font-weight: 600;
+  cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-dl:hover { background: #2ab36a; }
+.btn-cl {
+  background: var(--accent); color: #fff; border: none;
+  padding: 9px 18px; border-radius: 8px; font-size: .85rem; font-weight: 600;
+  cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-cl:hover { background: #3a7af0; }
+.btn-again {
+  background: var(--s3); color: var(--text); border: none;
+  padding: 9px 18px; border-radius: 8px; font-size: .85rem; cursor: pointer;
+}
+.btn-again:hover { background: var(--border); }
+.err-text { color: var(--red); font-size: .85rem; line-height: 1.5; }
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 100;
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+  backdrop-filter: blur(4px);
+}
+.overlay.hidden { display: none; }
+.modal {
+  background: var(--s1); border: 1px solid var(--border); border-radius: var(--r);
+  width: 100%; max-width: 460px; display: flex; flex-direction: column; max-height: 65vh;
+  box-shadow: 0 8px 40px rgba(0,0,0,.5);
+}
+.mhead { padding: 18px 20px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.mhead h3 { font-size: .95rem; font-weight: 600; }
+.mx { background: none; border: none; color: var(--muted); font-size: 1.1rem; cursor: pointer; padding: 2px 6px; border-radius: 6px; }
+.mx:hover { background: var(--s2); color: var(--text); }
+.bc { padding: 8px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 5px; font-size: .78rem; color: var(--muted); flex-wrap: wrap; min-height: 38px; }
+.bci { cursor: pointer; color: var(--accent); }
+.bci:hover { text-decoration: underline; }
+.bcs { color: var(--border); }
+.flist { flex: 1; overflow-y: auto; padding: 6px 10px; }
+.fi { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: 8px; cursor: pointer; font-size: .87rem; transition: background .1s; }
+.fi:hover { background: var(--s2); }
+.fi-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fi-arr { color: var(--muted); font-size: .75rem; }
+.fempty { text-align: center; color: var(--muted); padding: 28px; font-size: .85rem; }
+.mfoot { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+.bsm { padding: 8px 14px; border-radius: 8px; font-size: .83rem; cursor: pointer; border: none; }
+.bsm-sec { background: var(--s2); color: var(--text); border: 1px solid var(--border); }
+.bsm-sec:hover { border-color: var(--accent); color: var(--accent); }
+.bsm-pri { background: var(--accent); color: #fff; }
+.bsm-pri:hover { background: #3a7af0; }
+.hidden { display: none !important; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><div class="logo-icon">▶</div> YT Downloader</div>
+  <div id="hdr-user" class="user-chip hidden">
+    <strong id="hdr-email"></strong>
+    <button class="btn-xs" onclick="location.href='/auth/logout'">Logout</button>
+  </div>
+</header>
+
+<div class="card">
+  <div class="url-wrap">
+    <input id="url" class="url-input" type="url" placeholder="Paste YouTube link..." oninput="onUrl()" autocomplete="off">
+    <button class="url-clear" id="uclear" onclick="clearUrl()">✕</button>
+  </div>
+
+  <div class="mode-tabs">
+    <button class="tab active" id="tdl" onclick="setMode('download')">⬇ Download to Computer</button>
+    <button class="tab" id="tcloud" onclick="setMode('cloud')">☁ Save to Cloud</button>
+  </div>
+
+  <div class="cloud-section hidden" id="csec">
+    <div class="section-label">Storage provider</div>
+    <div class="providers">
+
+      <div class="pcard sel" id="prov-google" onclick="selectProv('google')">
+        <div class="pcard-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+        </div>
+        <div class="pcard-name">Google Drive</div>
+        <div class="pcard-status" id="gs-status">Not connected</div>
+      </div>
+
+      <div class="pcard disabled">
+        <div class="soon">Soon</div>
+        <div class="pcard-icon">🟦</div>
+        <div class="pcard-name">OneDrive</div>
+        <div class="pcard-status">Microsoft</div>
+      </div>
+
+      <div class="pcard disabled">
+        <div class="soon">Soon</div>
+        <div class="pcard-icon">🟦</div>
+        <div class="pcard-name">Dropbox</div>
+        <div class="pcard-status">Dropbox Inc</div>
+      </div>
+
+    </div>
+
+    <div class="connect-block" id="gblock">
+      <div>
+        <div class="ci-title" id="g-title">Connect Google Drive</div>
+        <div class="ci-sub" id="g-sub">Sign in to upload directly to your Drive</div>
+      </div>
+      <div id="g-actions">
+        <button class="btn-gsign" onclick="location.href='/auth/login'">
+          <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+          Sign in with Google
+        </button>
+      </div>
+    </div>
+
+    <div id="folder-block" class="hidden">
+      <div class="section-label">Destination folder</div>
+      <button class="folder-trigger" onclick="openModal()" type="button">
+        <span>📁</span>
+        <span class="ft-name" id="fdisplay">My Drive (root)</span>
+        <span style="color:var(--muted);font-size:.75rem">▼</span>
+      </button>
+    </div>
+  </div>
+
+  <button class="btn-main" id="btn-go" onclick="go()">⬇ Download Now</button>
+
+  <div class="prog-wrap" id="pwrap">
+    <div class="prog-bg"><div class="prog-fill" id="pfill" style="width:0%"></div></div>
+    <div class="prog-msg" id="pmsg">Starting...</div>
+  </div>
+
+  <div class="result-box" id="rbox"></div>
+</div>
+
+<!-- Folder modal -->
+<div class="overlay hidden" id="modal" onclick="oclick(event)">
+  <div class="modal">
+    <div class="mhead"><h3>Choose folder</h3><button class="mx" onclick="closeModal()">✕</button></div>
+    <div class="bc" id="mbread"></div>
+    <div class="flist" id="mlist"><div class="fempty">Loading...</div></div>
+    <div class="mfoot">
+      <button class="bsm bsm-sec" onclick="closeModal()">Cancel</button>
+      <button class="bsm bsm-pri" onclick="confirmFolder()">Select this folder</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let mode = 'download', provider = 'google';
+let gConnected = false, gEmail = '';
+let folderId = null, folderName = 'My Drive (root)';
+let jobId = null, pollTimer = null;
+let mCurrId = 'root', mCurrName = 'My Drive', mStack = [];
+
+async function init() {
+  const r = await fetch('/api/me').then(r => r.json());
+  if (r.google) {
+    gConnected = true; gEmail = r.google.email;
+    document.getElementById('hdr-user').classList.remove('hidden');
+    document.getElementById('hdr-email').textContent = gEmail;
+    document.getElementById('g-title').textContent = gEmail;
+    document.getElementById('g-title').style.color = 'var(--green)';
+    document.getElementById('g-sub').textContent = 'Google Drive connected';
+    document.getElementById('g-sub').className = 'ci-sub ok';
+    document.getElementById('g-actions').innerHTML = `<button class="btn-disc" onclick="location.href='/auth/logout'">Disconnect</button>`;
+    document.getElementById('gs-status').textContent = 'Connected ✓';
+    document.getElementById('folder-block').classList.remove('hidden');
+  }
+}
+
+function onUrl() {
+  const v = document.getElementById('url').value;
+  document.getElementById('uclear').classList.toggle('show', v.length > 0);
+}
+function clearUrl() {
+  document.getElementById('url').value = '';
+  document.getElementById('uclear').classList.remove('show');
+  document.getElementById('url').focus();
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('tdl').classList.toggle('active', m==='download');
+  document.getElementById('tcloud').classList.toggle('active', m==='cloud');
+  document.getElementById('csec').classList.toggle('hidden', m==='download');
+  document.getElementById('btn-go').textContent = m==='download' ? '⬇ Download Now' : '☁ Save to Google Drive';
+}
+
+function selectProv(p) {
+  if (p !== 'google') return;
+  provider = p;
+}
+
+async function go() {
+  const url = document.getElementById('url').value.trim();
+  if (!url) { shake(); return; }
+
+  const btn = document.getElementById('btn-go');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div>';
+
+  document.getElementById('rbox').style.display = 'none';
+  showProg(3, 'Starting...', '');
+
+  const body = { url, action: mode, provider };
+  if (mode === 'cloud' && folderId) body.folder_id = folderId;
+
+  const res = await fetch('/api/start', {
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const e = await res.json().catch(() => ({}));
+    showErr(e.detail || 'Error');
+    resetBtn(); return;
+  }
+
+  jobId = (await res.json()).job_id;
+  pollTimer = setInterval(poll, 1000);
+}
+
+async function poll() {
+  if (!jobId) return;
+  try {
+    const res = await fetch('/api/status/'+jobId);
+    if (!res.ok) {
+      clearInterval(pollTimer);
+      showErr(res.status === 404 ? 'Session lost (server restarted). Please try again.' : 'Server error ' + res.status);
+      resetBtn(); return;
+    }
+    const j = await res.json();
+    showProg(j.progress, j.message, j.status);
+    if (j.status === 'ready') { clearInterval(pollTimer); showReady(j); resetBtn(); }
+    else if (j.status === 'done') { clearInterval(pollTimer); showDone(j); resetBtn(); }
+    else if (j.status === 'error') { clearInterval(pollTimer); showErr(j.message); resetBtn(); }
+  } catch(_) {
+    // network hiccup — keep polling
+  }
+}
+
+function showProg(pct, msg, st) {
+  document.getElementById('pwrap').style.display = 'block';
+  const f = document.getElementById('pfill');
+  f.style.width = pct + '%';
+  f.className = 'prog-fill' + (st==='ready'||st==='done' ? ' done' : st==='error' ? ' err' : '');
+  document.getElementById('pmsg').textContent = msg;
+}
+
+function showReady(j) {
+  const b = document.getElementById('rbox');
+  b.style.display = 'block';
+  b.innerHTML = `<div class="result-inner ok">
+    <div class="ri-icon">✅</div>
+    <div class="ri-name">${esc(j.filename||'video.mp4')}</div>
+    <div class="ri-actions">
+      <a href="/api/download/${esc(jobId)}" download class="btn-dl">⬇ Download</a>
+      <button class="btn-again" onclick="reset()">Another video</button>
+    </div></div>`;
+}
+
+function showDone(j) {
+  const b = document.getElementById('rbox');
+  b.style.display = 'block';
+  b.innerHTML = `<div class="result-inner ok">
+    <div class="ri-icon">☁</div>
+    <div class="ri-name">${esc(j.filename||'video.mp4')}</div>
+    <div class="ri-actions">
+      <a href="${esc(j.link)}" target="_blank" class="btn-cl">Open in Drive</a>
+      <a href="/api/download/${esc(jobId)}" download class="btn-dl">⬇ Download too</a>
+      <button class="btn-again" onclick="reset()">Another video</button>
+    </div></div>`;
+}
+
+function showErr(msg) {
+  showProg(100, msg, 'error');
+  const b = document.getElementById('rbox');
+  b.style.display = 'block';
+  b.innerHTML = `<div class="result-inner err">
+    <div class="ri-icon">⚠️</div>
+    <div class="err-text">${esc(msg)}</div>
+    <div class="ri-actions" style="margin-top:12px">
+      <button class="btn-again" onclick="reset()">Try again</button>
+    </div></div>`;
+}
+
+function resetBtn() {
+  const btn = document.getElementById('btn-go');
+  btn.disabled = false;
+  btn.textContent = mode==='download' ? '⬇ Download Now' : '☁ Save to Google Drive';
+}
+
+function reset() {
+  document.getElementById('url').value = '';
+  document.getElementById('uclear').classList.remove('show');
+  document.getElementById('pwrap').style.display = 'none';
+  document.getElementById('rbox').style.display = 'none';
+  jobId = null;
+  if (pollTimer) clearInterval(pollTimer);
+}
+
+function shake() {
+  const e = document.getElementById('url');
+  e.style.borderColor = 'var(--red)'; e.focus();
+  setTimeout(() => e.style.borderColor='', 1500);
+}
+
+// Modal
+function openModal() {
+  mStack = [];
+  document.getElementById('modal').classList.remove('hidden');
+  loadFolders('root');
+}
+function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+function oclick(e) { if (e.target===document.getElementById('modal')) closeModal(); }
+
+async function loadFolders(pid) {
+  document.getElementById('mlist').innerHTML = '<div class="fempty">Loading...</div>';
+  const r = await fetch('/api/folders?parent_id='+encodeURIComponent(pid)).then(r=>r.json()).catch(()=>null);
+  if (!r) { document.getElementById('mlist').innerHTML = '<div class="fempty">Error loading</div>'; return; }
+  mCurrId = r.parent_id; mCurrName = r.parent_name;
+  renderBc();
+  const l = document.getElementById('mlist');
+  if (!r.folders.length) { l.innerHTML = '<div class="fempty">No folders here</div>'; return; }
+  l.innerHTML = r.folders.map(f =>
+    `<div class="fi" onclick="drill('${esc(f.id)}','${esc(f.name.replace(/'/g,"\\'"))}')">
+      <span>📁</span><span class="fi-name">${esc(f.name)}</span><span class="fi-arr">›</span>
+    </div>`).join('');
+}
+
+function renderBc() {
+  const parts = [{id:'root',name:'My Drive'}, ...mStack];
+  if (mCurrId !== 'root') parts.push({id:mCurrId, name:mCurrName});
+  document.getElementById('mbread').innerHTML = parts.map((p,i) => {
+    const last = i === parts.length-1;
+    return last
+      ? `<span style="color:var(--text)">${esc(p.name)}</span>`
+      : `<span class="bci" onclick="jump(${i})">${esc(p.name)}</span><span class="bcs">›</span>`;
+  }).join('');
+}
+
+function drill(id, name) { mStack.push({id:mCurrId,name:mCurrName}); loadFolders(id); }
+function jump(i) {
+  const parts = [{id:'root',name:'My Drive'},...mStack];
+  const t = parts[i]; mStack = parts.slice(1,i); loadFolders(t.id);
+}
+function confirmFolder() {
+  folderId = mCurrId==='root' ? null : mCurrId;
+  folderName = mCurrId==='root' ? 'My Drive (root)' : mCurrName;
+  document.getElementById('fdisplay').textContent = folderName;
+  closeModal();
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+init();
+</script>
+</body>
+</html>
