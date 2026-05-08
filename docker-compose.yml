@@ -67,6 +67,7 @@ services:
       - '8080:8080'
     volumes:
       - ./tools/app:/app
+      - ~/.config/yt-dlp:/cookies:ro
 
 volumes:
   postgres_data:

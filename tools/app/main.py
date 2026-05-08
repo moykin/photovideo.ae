@@ -1,5 +1,6 @@
 import asyncio
 import os
+import json
 import re
 import secrets
 import threading
@@ -37,6 +38,28 @@ SCOPES = [
 
 DOWNLOADS_DIR = Path("/tmp/yt2gdrive")
 DOWNLOADS_DIR.mkdir(exist_ok=True)
+
+HISTORY_FILE = DOWNLOADS_DIR / "history.json"
+_history: dict[str, list] = {}
+try:
+    if HISTORY_FILE.exists():
+        _history = json.loads(HISTORY_FILE.read_text())
+except Exception:
+    pass
+
+
+def _save_history(key: str, entry: dict):
+    if not key:
+        return
+    _history.setdefault(key, [])
+    _history[key] = [e for e in _history[key] if e.get("job_id") != entry["job_id"]]
+    _history[key].insert(0, entry)
+    _history[key] = _history[key][:50]
+    try:
+        HISTORY_FILE.write_text(json.dumps(_history))
+    except Exception:
+        pass
+
 
 _sessions: dict[str, dict] = {}
 jobs: dict[str, dict] = {}
@@ -101,7 +124,10 @@ def _refresh_if_needed(creds, data):
 
 @app.get("/")
 async def index():
-    return FileResponse("static/index.html")
+    return FileResponse(
+        "static/index.html",
+        headers={"Cache-Control": "no-store, no-cache, must-revalidate"},
+    )
 
 
 @app.get("/auth/login")
@@ -221,7 +247,7 @@ async def start(request: Request, background_tasks: BackgroundTasks):
 
     background_tasks.add_task(
         _process, job_id, url, action, provider, folder_id,
-        dict(data) if data else None
+        dict(data) if data else None, request.session.get("sid", "")
     )
     return JSONResponse({"job_id": job_id})
 
@@ -245,35 +271,140 @@ async def job_status(job_id: str):
     return JSONResponse({k: v for k, v in job.items() if k not in ("filepath", "created_at")})
 
 
+@app.get("/api/history")
+async def get_history(request: Request):
+    data = _get_session(request)
+    email = (data or {}).get("email", "")
+    sid = request.session.get("sid", "")
+    key = email or sid
+    if not key:
+        return JSONResponse({"items": []})
+    items = _history.get(key, [])
+    enriched = []
+    for item in items:
+        e = dict(item)
+        job = jobs.get(item.get("job_id", ""))
+        e["downloadable"] = bool(
+            job and job.get("filepath") and os.path.exists(job.get("filepath", ""))
+        )
+        enriched.append(e)
+    return JSONResponse({"items": enriched})
+
+
+@app.post("/api/drive/folder")
+async def create_drive_folder(request: Request):
+    body = await request.json()
+    name = body.get("name", "").strip()
+    parent_id = body.get("parent_id", "root")
+    if not name:
+        raise HTTPException(status_code=400, detail="Name required")
+    data = _get_session(request)
+    if not data or not data.get("google_connected"):
+        raise HTTPException(status_code=401, detail="Not connected")
+    creds = _creds(data)
+    _refresh_if_needed(creds, data)
+    svc = build("drive", "v3", credentials=creds)
+    meta = {"name": name, "mimeType": "application/vnd.google-apps.folder"}
+    if parent_id and parent_id != "root":
+        meta["parents"] = [parent_id]
+    folder = svc.files().create(body=meta, fields="id,name").execute()
+    return JSONResponse(folder)
+
+
+@app.patch("/api/drive/move/{file_id}")
+async def move_drive_file(file_id: str, request: Request):
+    body = await request.json()
+    folder_id = body.get("folder_id") or "root"
+    data = _get_session(request)
+    if not data or not data.get("google_connected"):
+        raise HTTPException(status_code=401, detail="Not connected")
+    creds = _creds(data)
+    _refresh_if_needed(creds, data)
+    svc = build("drive", "v3", credentials=creds)
+    file_meta = svc.files().get(fileId=file_id, fields="parents").execute()
+    old_parents = ",".join(file_meta.get("parents", []))
+    svc.files().update(
+        fileId=file_id,
+        addParents=folder_id,
+        removeParents=old_parents,
+        fields="id,parents",
+    ).execute()
+    return JSONResponse({"ok": True})
+
+
 # ── Background worker ─────────────────────────────────────────────────────────
 
 async def _read_progress(stream, job_id: str):
     async for raw in stream:
         line = raw.decode(errors="replace").strip()
+
+        # [download]  45.2% of 245.32MiB at 3.20MiB/s ETA 01:10
+        dl = re.search(
+            r"\[download\]\s+(\d+\.?\d*)%\s+of\s+([\d.]+\S+)\s+at\s+([\d.]+\S+)\s+ETA\s+(\S+)",
+            line,
+        )
+        if dl:
+            pct, size, speed, eta = float(dl.group(1)), dl.group(2), dl.group(3), dl.group(4)
+            jobs[job_id].update({
+                "step": "downloading",
+                "step_progress": int(pct),
+                "progress": max(5, int(pct * 0.46)),
+                "message": f"Downloading... {int(pct)}%",
+                "detail": f"{size} · {speed} · ETA {eta}",
+            })
+            continue
+
+        # [download]  45.2% of 245.32MiB at ... (no speed yet)
         m = re.search(r"(\d+(?:\.\d+)?)%", line)
         if m and "[download]" in line:
             pct = float(m.group(1))
-            jobs[job_id]["progress"] = max(2, int(pct * 0.48))
-            jobs[job_id]["message"] = f"Downloading... {int(pct)}%"
+            jobs[job_id].update({
+                "step": "downloading",
+                "step_progress": int(pct),
+                "progress": max(5, int(pct * 0.46)),
+                "message": f"Downloading... {int(pct)}%",
+            })
+            continue
+
+        if "[Merger]" in line or ("[ffmpeg]" in line and "Merging" in line):
+            jobs[job_id].update({
+                "step": "processing",
+                "step_progress": 50,
+                "progress": 48,
+                "message": "Merging video & audio...",
+                "detail": "ffmpeg is combining tracks",
+            })
 
 
 async def _process(
     job_id: str, url: str, action: str, provider: str,
-    folder_id: Optional[str], creds_data: Optional[dict],
+    folder_id: Optional[str], creds_data: Optional[dict], sid: str = "",
 ):
     try:
-        jobs[job_id].update({"status": "downloading", "progress": 2, "message": "Downloading video..."})
+        jobs[job_id].update({
+            "status": "downloading", "step": "fetching",
+            "step_progress": 0, "progress": 2,
+            "message": "Fetching video info...", "detail": "Connecting to YouTube",
+        })
 
         job_dir = DOWNLOADS_DIR / job_id
         job_dir.mkdir(exist_ok=True)
 
-        proc = await asyncio.create_subprocess_exec(
+        cmd = [
             "yt-dlp", "--no-playlist",
             "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
             "--merge-output-format", "mp4",
             "-o", str(job_dir / "%(title)s.%(ext)s"),
             "--print", "after_move:filepath",
-            url,
+        ]
+        for cookies_path in (Path("/cookies/youtube-cookies.txt"), Path("/app/cookies.txt")):
+            if cookies_path.exists():
+                cmd += ["--cookies", str(cookies_path)]
+                break
+        cmd.append(url)
+
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
@@ -303,15 +434,34 @@ async def _process(
 
         if action == "download":
             jobs[job_id].update({"status": "ready", "progress": 100, "message": "Ready to download!"})
+            _save_history((creds_data or {}).get("email") or sid, {
+                "job_id": job_id, "filename": filename,
+                "action": "download", "timestamp": time.time(), "status": "ready",
+            })
             return
 
         if action == "cloud" and provider == "google" and creds_data:
             size_mb = os.path.getsize(filepath) / 1024 / 1024
             jobs[job_id].update({
-                "status": "uploading", "progress": 50,
-                "message": f"Uploading {filename} ({size_mb:.0f} MB) to Drive...",
+                "status": "uploading", "step": "connecting",
+                "step_progress": 0, "progress": 50,
+                "message": "Connecting to Google Drive...",
+                "detail": f"{filename} · {size_mb:.0f} MB ready to upload",
+            })
+            await asyncio.sleep(0.5)
+            jobs[job_id].update({
+                "step": "uploading", "step_progress": 0, "progress": 52,
+                "message": "Uploading to Google Drive...", "detail": "0%",
             })
             await asyncio.to_thread(_upload_gdrive, job_id, creds_data, filepath, filename, folder_id)
+            _save_history((creds_data or {}).get("email") or sid, {
+                "job_id": job_id,
+                "filename": jobs[job_id].get("filename", filename),
+                "action": "cloud", "provider": provider,
+                "file_id": jobs[job_id].get("file_id"),
+                "link": jobs[job_id].get("link"),
+                "timestamp": time.time(), "status": "done",
+            })
 
     except Exception as e:
         jobs[job_id].update({"status": "error", "message": str(e)})
@@ -333,8 +483,14 @@ def _upload_gdrive(job_id, creds_data, filepath, filename, folder_id):
     while response is None:
         status, response = req.next_chunk()
         if status:
-            pct = 50 + int(status.progress() * 48)
-            jobs[job_id].update({"status": "uploading", "progress": pct, "message": f"Uploading... {pct}%"})
+            upload_pct = int(status.progress() * 100)
+            pct = 52 + int(status.progress() * 46)
+            jobs[job_id].update({
+                "status": "uploading", "step": "uploading",
+                "step_progress": upload_pct, "progress": pct,
+                "message": f"Uploading to Google Drive...",
+                "detail": f"{upload_pct}%",
+            })
 
     jobs[job_id].update({
         "status": "done", "progress": 100, "message": "Done!",
