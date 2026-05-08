@@ -34,7 +34,7 @@ export default async function ProfilePage({ params }: Props) {
   ]);
 
   const portfolios = portfoliosRes.data;
-  const reviews = reviewsRes.data;
+  const reviews: any[] = reviewsRes.data;
 
   return (
     <div>
