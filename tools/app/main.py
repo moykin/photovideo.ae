@@ -120,6 +120,237 @@ def _refresh_if_needed(creds, data):
         data["token"] = creds.token
 
 
+# ── Article data ─────────────────────────────────────────────────────────────
+
+ARTICLE_SLUGS = {
+    'guide-download': 'how-to-download-youtube-video',
+    'guide-cloud': 'save-youtube-video-to-google-drive',
+    'guide-device': 'download-youtube-videos-pc-mobile',
+}
+SLUG_TO_ID = {v: k for k, v in ARTICLE_SLUGS.items()}
+
+ARTICLES: dict = {
+  'en': [
+    { 'id': 'guide-download',
+      'title': 'How to Download a YouTube Video',
+      'description': 'Step-by-step guide to downloading any YouTube video for free in HD quality.',
+      'keywords': 'how to download youtube video, youtube video downloader, youtube to mp4 free',
+      'body': '<p>Downloading YouTube videos is fast and free. Follow these steps:</p><ol><li>Find the YouTube video you want to save</li><li>Copy the URL from the browser address bar</li><li>Paste it into the field on the <a href="/download">main page</a></li><li>Select <strong>Download to Computer</strong> and click <strong>Download Now</strong></li><li>When processing is complete, click the <strong>Download</strong> button to save the MP4 file</li></ol><p>You can download tutorials, music videos, documentaries and more in the best available quality — up to HD and 4K. No software installation required.</p><h2>FAQ</h2><dl><dt>Is it free?</dt><dd>Yes — completely free with no limits.</dd><dt>What quality?</dt><dd>We automatically select the best format available, up to 4K.</dd><dt>Do I need an account?</dt><dd>No account needed to download files to your device.</dd></dl>'},
+    { 'id': 'guide-cloud',
+      'title': 'How to Save a YouTube Video to Google Drive',
+      'description': 'Upload YouTube videos directly to Google Drive, no local storage required. Free and fast.',
+      'keywords': 'save youtube to google drive, youtube google drive, upload youtube video to drive',
+      'body': '<p>Our <strong>Save to Cloud</strong> feature lets you upload YouTube videos straight to Google Drive — without occupying space on your device.</p><h2>Steps</h2><ol><li>Paste the YouTube URL into the field on the <a href="/download">main page</a></li><li>Click the <strong>Save to Cloud</strong> tab</li><li>Connect your Google Drive account (one-time)</li><li>Optionally choose a destination folder</li><li>Click <strong>Save to Google Drive</strong></li></ol><p>The video is processed and uploaded automatically. You receive a direct Google Drive link when the upload is complete.</p><h2>Benefits</h2><dl><dt>No device storage used</dt><dd>The file goes straight to Drive — never touches your hard disk.</dd><dt>Access anywhere</dt><dd>Watch or share from any phone, tablet, or computer.</dd><dt>Organised library</dt><dd>Create folders in Google Drive and keep everything tidy.</dd></dl>'},
+    { 'id': 'guide-device',
+      'title': 'How to Download YouTube Videos to PC or Mobile Phone',
+      'description': 'Save YouTube videos as MP4 files to Windows, Mac, iPhone or Android. Free, no software needed.',
+      'keywords': 'download youtube video to pc, download youtube video mobile, youtube mp4 iphone android',
+      'body': '<p>Saving YouTube videos to your device lets you watch them offline — on a flight, commute, or anywhere without internet.</p><h2>On a Computer (Windows, Mac, Linux)</h2><ol><li>Go to YouTube and open the video you want</li><li>Copy the URL from the browser address bar</li><li>Paste it into the field on the <a href="/download">main page</a></li><li>Click <strong>Download to Computer → Download Now</strong></li><li>When ready, click the <strong>Download</strong> button — the MP4 file saves to your Downloads folder</li></ol><h2>On Mobile (iPhone or Android)</h2><ol><li>Open the YouTube app and find your video</li><li>Tap <strong>Share → Copy link</strong></li><li>Open this page in your mobile browser</li><li>Paste the link and tap <strong>Download Now</strong></li><li>Tap <strong>Download</strong> and the video saves to your device</li></ol><p>The file is saved as an MP4, compatible with all media players. A typical 10-minute video takes about 30–60 seconds to process.</p>'},
+  ],
+  'hi': [
+    { 'id': 'guide-download',
+      'title': 'YouTube वीडियो कैसे डाउनलोड करें',
+      'description': 'किसी भी YouTube वीडियो को मुफ्त में HD क्वालिटी में डाउनलोड करने की चरण-दर-चरण गाइड।',
+      'keywords': 'youtube video download kaise kare, youtube downloader hindi, youtube to mp4 free',
+      'body': '<p>YouTube वीडियो डाउनलोड करना बहुत आसान है। इन चरणों का पालन करें:</p><ol><li>वह YouTube वीडियो खोजें जिसे आप सेव करना चाहते हैं</li><li>ब्राउज़र के एड्रेस बार से URL कॉपी करें</li><li><a href="/download">मुख्य पेज</a> पर दिए गए फील्ड में पेस्ट करें</li><li><strong>कंप्यूटर पर डाउनलोड</strong> चुनें और <strong>अभी डाउनलोड करें</strong> पर क्लिक करें</li><li>प्रोसेसिंग पूरी होने पर <strong>डाउनलोड</strong> बटन पर क्लिक करें</li></ol><p>बिना किसी सॉफ्टवेयर के HD और 4K क्वालिटी में वीडियो डाउनलोड करें।</p><h2>अक्सर पूछे जाने वाले सवाल</h2><dl><dt>क्या यह मुफ्त है?</dt><dd>हां, पूरी तरह मुफ्त और बिना किसी सीमा के।</dd><dt>वीडियो क्वालिटी?</dt><dd>हम स्वचालित रूप से सर्वश्रेष्ठ उपलब्ध फॉर्मेट चुनते हैं, 4K तक।</dd></dl>'},
+    { 'id': 'guide-cloud',
+      'title': 'YouTube वीडियो को Google Drive में कैसे सेव करें',
+      'description': 'YouTube वीडियो को सीधे Google Drive में अपलोड करें, लोकल स्टोरेज की जरूरत नहीं।',
+      'keywords': 'youtube video google drive mein save kare, youtube google drive hindi',
+      'body': '<p><strong>क्लाउड में सेव</strong> फीचर से आप YouTube वीडियो को सीधे Google Drive में अपलोड कर सकते हैं।</p><ol><li>YouTube URL <a href="/download">मुख्य पेज</a> पर पेस्ट करें</li><li><strong>क्लाउड में सेव</strong> टैब पर क्लिक करें</li><li>अपना Google Drive अकाउंट कनेक्ट करें</li><li>डेस्टिनेशन फोल्डर चुनें (वैकल्पिक)</li><li><strong>Google Drive में सेव करें</strong> पर क्लिक करें</li></ol><h2>फायदे</h2><dl><dt>डिवाइस स्टोरेज नहीं लगता</dt><dd>फाइल सीधे Drive में जाती है।</dd><dt>कहीं से भी एक्सेस</dt><dd>किसी भी फोन, टैबलेट या कंप्यूटर से देखें।</dd></dl>'},
+    { 'id': 'guide-device',
+      'title': 'PC या मोबाइल पर YouTube वीडियो कैसे डाउनलोड करें',
+      'description': 'YouTube वीडियो को Windows, Mac, iPhone या Android पर MP4 फाइल के रूप में सेव करें।',
+      'keywords': 'pc par youtube video download, mobile par youtube video download, iphone android youtube',
+      'body': '<p>PC या मोबाइल पर YouTube वीडियो सेव करें और बिना इंटरनेट के देखें।</p><h2>कंप्यूटर पर (Windows/Mac):</h2><ol><li>YouTube से URL कॉपी करें</li><li><a href="/download">यहाँ</a> पेस्ट करें और <strong>डाउनलोड</strong> करें</li><li>MP4 फाइल आपके Downloads फोल्डर में सेव होगी</li></ol><h2>मोबाइल पर (iPhone/Android):</h2><ol><li>YouTube ऐप में <strong>Share → Link Copy</strong> करें</li><li>मोबाइल ब्राउज़र में यह पेज खोलें</li><li>URL पेस्ट करें और डाउनलोड करें</li></ol>'},
+  ],
+  'zh': [
+    { 'id': 'guide-download',
+      'title': '如何下载YouTube视频',
+      'description': '免费高清下载任意YouTube视频的分步指南。无需安装软件。',
+      'keywords': '如何下载youtube视频, youtube视频下载, youtube转mp4免费',
+      'body': '<p>使用我们的免费工具，轻松下载任何YouTube视频：</p><ol><li>在YouTube找到您想下载的视频</li><li>从地址栏复制视频URL</li><li>将URL粘贴到<a href="/download">主页</a>的输入框</li><li>选择<strong>下载到电脑</strong>选项卡</li><li>点击<strong>立即下载</strong></li><li>处理完成后点击<strong>下载</strong>保存文件</li></ol><p>无需安装任何软件，支持HD和4K画质下载，完全免费。</p><h2>常见问题</h2><dl><dt>是否免费？</dt><dd>是的，完全免费，无任何限制。</dd><dt>支持什么画质？</dt><dd>自动选择最佳格式，最高支持4K。</dd></dl>'},
+    { 'id': 'guide-cloud',
+      'title': '如何将YouTube视频保存到Google Drive',
+      'description': '将YouTube视频直接上传到Google Drive，无需占用本地存储空间。免费快速。',
+      'keywords': '保存youtube到google drive, youtube google drive上传, youtube云存储',
+      'body': '<p>使用<strong>保存到云端</strong>功能，将YouTube视频直接上传到Google Drive。</p><ol><li>将YouTube URL粘贴到<a href="/download">主页</a></li><li>点击<strong>保存到云端</strong>标签</li><li>登录您的Google Drive账户</li><li>选择目标文件夹（可选）</li><li>点击<strong>保存到Google Drive</strong></li></ol><h2>优势</h2><dl><dt>不占用设备存储</dt><dd>文件直接存入Drive，不经过本地硬盘。</dd><dt>随时随地访问</dt><dd>从任何手机、平板或电脑观看或分享。</dd></dl>'},
+    { 'id': 'guide-device',
+      'title': '如何将YouTube视频下载到电脑或手机',
+      'description': '将YouTube视频保存为MP4文件到Windows、Mac、iPhone或Android设备。',
+      'keywords': '下载youtube到电脑, 下载youtube到手机, iphone android youtube下载',
+      'body': '<p>将YouTube视频保存到设备，随时随地离线观看。</p><h2>电脑端（Windows/Mac/Linux）：</h2><ol><li>从YouTube复制视频URL</li><li>粘贴到<a href="/download">本页面</a>上方</li><li>点击下载并保存MP4文件到下载文件夹</li></ol><h2>手机端（iPhone/Android）：</h2><ol><li>在YouTube应用中点击<strong>分享→复制链接</strong></li><li>在手机浏览器中打开本页</li><li>粘贴链接并点击下载</li></ol>'},
+  ],
+  'ar': [
+    { 'id': 'guide-download',
+      'title': 'كيفية تحميل مقطع من يوتيوب',
+      'description': 'دليل خطوة بخطوة لتحميل أي فيديو يوتيوب مجاناً بجودة HD.',
+      'keywords': 'كيف تحمل فيديو من يوتيوب, تحميل يوتيوب مجاني, يوتيوب mp4',
+      'body': '<p>تحميل مقاطع يوتيوب بخطوات بسيطة:</p><ol><li>ابحث عن الفيديو على يوتيوب</li><li>انسخ رابط الفيديو من شريط العنوان</li><li>الصق الرابط في حقل <a href="/download">الصفحة الرئيسية</a></li><li>اختر <strong>تحميل إلى الجهاز</strong></li><li>انقر على <strong>تحميل الآن</strong></li><li>بعد المعالجة، انقر على <strong>تحميل</strong> لحفظ الملف</li></ol><p>لا يلزم تثبيت أي برنامج. يدعم جودة HD و4K مجاناً.</p><h2>الأسئلة الشائعة</h2><dl><dt>هل هو مجاني؟</dt><dd>نعم، مجاني تماماً بدون قيود.</dd><dt>ما جودة الفيديو؟</dt><dd>نختار تلقائياً أفضل صيغة متاحة حتى 4K.</dd></dl>'},
+    { 'id': 'guide-cloud',
+      'title': 'كيفية حفظ مقطع يوتيوب في Google Drive',
+      'description': 'رفع مقاطع يوتيوب مباشرة إلى Google Drive دون الحاجة لمساحة تخزين محلية.',
+      'keywords': 'حفظ يوتيوب في google drive, رفع يوتيوب للسحابة, يوتيوب google drive',
+      'body': '<p>احفظ مقاطع يوتيوب مباشرة في Google Drive دون استخدام مساحة تخزين محلية.</p><ol><li>الصق رابط يوتيوب في <a href="/download">الصفحة الرئيسية</a></li><li>اختر تبويب <strong>الحفظ على السحابة</strong></li><li>سجّل الدخول بحساب Google Drive</li><li>اختر مجلداً (اختياري)</li><li>انقر <strong>حفظ في Google Drive</strong></li></ol><h2>المزايا</h2><dl><dt>لا مساحة مستهلكة على الجهاز</dt><dd>يذهب الملف مباشرة إلى Drive.</dd><dt>وصول من أي مكان</dt><dd>شاهد أو شارك من أي هاتف أو جهاز لوحي أو كمبيوتر.</dd></dl>'},
+    { 'id': 'guide-device',
+      'title': 'كيفية تحميل مقاطع يوتيوب على الكمبيوتر أو الهاتف',
+      'description': 'حفظ مقاطع يوتيوب بصيغة MP4 على Windows أو Mac أو iPhone أو Android.',
+      'keywords': 'تحميل يوتيوب على الكمبيوتر, تحميل يوتيوب على الهاتف, يوتيوب mp4 ايفون اندرويد',
+      'body': '<p>حمّل مقاطع يوتيوب على جهازك للمشاهدة بدون إنترنت.</p><h2>على الكمبيوتر:</h2><ol><li>انسخ رابط الفيديو من يوتيوب</li><li>الصقه في <a href="/download">الصفحة الرئيسية</a> واضغط تحميل</li><li>سيُحفظ الملف بصيغة MP4 في مجلد التنزيلات</li></ol><h2>على الهاتف (iPhone/Android):</h2><ol><li>افتح الفيديو في تطبيق يوتيوب</li><li>اضغط مشاركة ← نسخ الرابط</li><li>افتح هذه الصفحة في المتصفح والصق الرابط</li></ol>'},
+  ],
+  'es': [
+    { 'id': 'guide-download',
+      'title': 'Cómo descargar un vídeo de YouTube',
+      'description': 'Guía paso a paso para descargar cualquier vídeo de YouTube gratis en HD. Sin instalación.',
+      'keywords': 'como descargar video youtube, descargador youtube gratis, youtube a mp4',
+      'body': '<p>Descarga vídeos de YouTube gratis siguiendo estos pasos:</p><ol><li>Encuentra el vídeo que quieres en YouTube</li><li>Copia la URL del vídeo desde la barra de direcciones</li><li>Pégala en el campo de la <a href="/download">página principal</a></li><li>Selecciona <strong>Descargar al Ordenador</strong></li><li>Haz clic en <strong>Descargar Ahora</strong></li><li>Cuando esté listo, descarga el archivo MP4</li></ol><p>Sin instalación de software. Compatible con calidad HD y 4K.</p><h2>Preguntas frecuentes</h2><dl><dt>¿Es gratuito?</dt><dd>Sí, completamente gratis sin límites.</dd><dt>¿Qué calidad?</dt><dd>Seleccionamos automáticamente el mejor formato disponible, hasta 4K.</dd></dl>'},
+    { 'id': 'guide-cloud',
+      'title': 'Cómo guardar un vídeo de YouTube en Google Drive',
+      'description': 'Sube vídeos de YouTube directamente a Google Drive sin usar almacenamiento local.',
+      'keywords': 'guardar youtube en google drive, subir youtube a drive, youtube google drive gratis',
+      'body': '<p>Guarda vídeos de YouTube directamente en Google Drive sin usar almacenamiento local.</p><ol><li>Pega la URL de YouTube en la <a href="/download">página principal</a></li><li>Haz clic en <strong>Guardar en la Nube</strong></li><li>Conecta tu cuenta de Google Drive</li><li>Elige una carpeta (opcional)</li><li>Haz clic en <strong>Guardar en Google Drive</strong></li></ol><h2>Ventajas</h2><dl><dt>Sin almacenamiento local</dt><dd>El archivo va directamente a Drive sin pasar por tu disco duro.</dd><dt>Acceso desde cualquier lugar</dt><dd>Ve o comparte desde cualquier teléfono, tablet u ordenador.</dd></dl>'},
+    { 'id': 'guide-device',
+      'title': 'Cómo descargar vídeos de YouTube al PC o móvil',
+      'description': 'Guarda vídeos de YouTube como archivos MP4 en Windows, Mac, iPhone o Android.',
+      'keywords': 'descargar youtube al pc, descargar youtube al movil, youtube mp4 iphone android',
+      'body': '<p>Descarga vídeos de YouTube en tu PC o móvil para verlos sin internet.</p><h2>En ordenador (Windows/Mac):</h2><ol><li>Copia la URL del vídeo de YouTube</li><li>Pégala en la <a href="/download">página principal</a> y haz clic en Descargar</li><li>El archivo MP4 se guarda en tu carpeta de Descargas</li></ol><h2>En móvil (iPhone/Android):</h2><ol><li>Abre el vídeo en YouTube y toca <strong>Compartir → Copiar enlace</strong></li><li>Abre esta página en el navegador de tu móvil</li><li>Pega el enlace y descarga el vídeo</li></ol>'},
+  ],
+  'de': [
+    { 'id': 'guide-download',
+      'title': 'Wie man ein YouTube-Video herunterlädt',
+      'description': 'Schritt-für-Schritt-Anleitung zum kostenlosen Herunterladen beliebiger YouTube-Videos in HD.',
+      'keywords': 'youtube video herunterladen, youtube downloader kostenlos, youtube zu mp4',
+      'body': '<p>YouTube-Videos kostenlos herunterladen – so geht\'s:</p><ol><li>Öffne das gewünschte Video auf YouTube</li><li>Kopiere die URL aus der Adressleiste</li><li>Füge sie in das Feld auf der <a href="/download">Hauptseite</a> ein</li><li>Wähle <strong>Auf Computer herunterladen</strong></li><li>Klicke auf <strong>Jetzt herunterladen</strong></li><li>Lade die MP4-Datei nach der Verarbeitung herunter</li></ol><p>Keine Installation nötig. Unterstützt HD- und 4K-Qualität.</p><h2>Häufige Fragen</h2><dl><dt>Ist es kostenlos?</dt><dd>Ja — komplett kostenlos ohne Einschränkungen.</dd><dt>Welche Qualität?</dt><dd>Wir wählen automatisch das beste verfügbare Format, bis zu 4K.</dd></dl>'},
+    { 'id': 'guide-cloud',
+      'title': 'YouTube-Videos in Google Drive speichern',
+      'description': 'YouTube-Videos direkt in Google Drive hochladen, ohne lokalen Speicher zu verwenden.',
+      'keywords': 'youtube in google drive speichern, youtube hochladen drive, youtube cloud kostenlos',
+      'body': '<p>Speichere YouTube-Videos direkt in Google Drive – ohne lokalen Speicher zu verbrauchen.</p><ol><li>Füge die YouTube-URL auf der <a href="/download">Hauptseite</a> ein</li><li>Wähle <strong>In der Cloud speichern</strong></li><li>Melde dich mit Google Drive an</li><li>Wähle optional einen Ordner</li><li>Klicke auf <strong>In Google Drive speichern</strong></li></ol><h2>Vorteile</h2><dl><dt>Kein lokaler Speicher</dt><dd>Die Datei geht direkt in Drive — ohne deine Festplatte zu berühren.</dd><dt>Zugriff überall</dt><dd>Schaue oder teile von jedem Gerät.</dd></dl>'},
+    { 'id': 'guide-device',
+      'title': 'YouTube-Videos auf PC oder Handy herunterladen',
+      'description': 'YouTube-Videos als MP4-Dateien auf Windows, Mac, iPhone oder Android speichern.',
+      'keywords': 'youtube auf pc herunterladen, youtube auf handy herunterladen, youtube mp4 iphone android',
+      'body': '<p>Lade YouTube-Videos auf PC oder Handy für die Offline-Wiedergabe.</p><h2>Am Computer (Windows/Mac):</h2><ol><li>Kopiere die Video-URL von YouTube</li><li>Füge sie auf der <a href="/download">Hauptseite</a> ein und klicke auf Herunterladen</li><li>Die MP4-Datei wird in deinen Downloads gespeichert</li></ol><h2>Auf dem Handy (iPhone/Android):</h2><ol><li>Tippe in YouTube auf <strong>Teilen → Link kopieren</strong></li><li>Öffne diese Seite im mobilen Browser</li><li>Füge den Link ein und lade das Video herunter</li></ol>'},
+  ],
+  'fr': [
+    { 'id': 'guide-download',
+      'title': 'Comment télécharger une vidéo YouTube',
+      'description': 'Guide étape par étape pour télécharger gratuitement n\'importe quelle vidéo YouTube en HD.',
+      'keywords': 'comment télécharger video youtube, téléchargeur youtube gratuit, youtube mp4 gratuit',
+      'body': '<p>Téléchargez des vidéos YouTube gratuitement en quelques étapes :</p><ol><li>Trouvez la vidéo sur YouTube</li><li>Copiez l\'URL depuis la barre d\'adresse</li><li>Collez-la dans le champ de la <a href="/download">page principale</a></li><li>Choisissez <strong>Télécharger sur l\'Ordinateur</strong></li><li>Cliquez sur <strong>Télécharger maintenant</strong></li><li>Une fois prêt, téléchargez le fichier MP4</li></ol><p>Aucun logiciel à installer. Qualité HD et 4K disponible.</p><h2>Questions fréquentes</h2><dl><dt>Est-ce gratuit ?</dt><dd>Oui, complètement gratuit sans limites.</dd><dt>Quelle qualité ?</dt><dd>Nous sélectionnons automatiquement le meilleur format, jusqu\'en 4K.</dd></dl>'},
+    { 'id': 'guide-cloud',
+      'title': 'Comment sauvegarder une vidéo YouTube dans Google Drive',
+      'description': 'Envoyez des vidéos YouTube directement dans Google Drive sans stockage local.',
+      'keywords': 'sauvegarder youtube dans google drive, youtube vers drive gratuit, uploader youtube drive',
+      'body': '<p>Enregistrez des vidéos YouTube directement dans Google Drive sans occuper d\'espace local.</p><ol><li>Collez l\'URL YouTube sur la <a href="/download">page principale</a></li><li>Cliquez sur <strong>Sauvegarder dans le Cloud</strong></li><li>Connectez votre compte Google Drive</li><li>Choisissez un dossier (optionnel)</li><li>Cliquez sur <strong>Sauvegarder dans Google Drive</strong></li></ol><h2>Avantages</h2><dl><dt>Pas de stockage local</dt><dd>Le fichier va directement dans Drive.</dd><dt>Accès partout</dt><dd>Regardez ou partagez depuis n\'importe quel appareil.</dd></dl>'},
+    { 'id': 'guide-device',
+      'title': 'Comment télécharger des vidéos YouTube sur PC ou téléphone',
+      'description': 'Enregistrez des vidéos YouTube en MP4 sur Windows, Mac, iPhone ou Android.',
+      'keywords': 'télécharger youtube sur pc, télécharger youtube sur telephone, youtube mp4 iphone android',
+      'body': '<p>Téléchargez des vidéos YouTube sur PC ou mobile pour les regarder hors connexion.</p><h2>Sur ordinateur (Windows/Mac) :</h2><ol><li>Copiez l\'URL de la vidéo YouTube</li><li>Collez-la sur la <a href="/download">page principale</a> et cliquez sur Télécharger</li><li>Le fichier MP4 est enregistré dans votre dossier Téléchargements</li></ol><h2>Sur mobile (iPhone/Android) :</h2><ol><li>Dans YouTube, appuyez sur <strong>Partager → Copier le lien</strong></li><li>Ouvrez cette page dans le navigateur mobile</li><li>Collez le lien et téléchargez la vidéo</li></ol>'},
+  ],
+}
+
+LANG_NAMES = {'en':'English','hi':'हिन्दी','zh':'中文','ar':'العربية','es':'Español','de':'Deutsch','fr':'Français'}
+LANG_DIRS  = {'en':'ltr','hi':'ltr','zh':'ltr','ar':'rtl','es':'ltr','de':'ltr','fr':'ltr'}
+
+BASE_URL = "https://photovideo.ae/download"
+
+
+def _article_html(lang: str, article: dict) -> str:
+    slug = ARTICLE_SLUGS[article['id']]
+    hreflangs = '\n'.join(
+        f'<link rel="alternate" hreflang="{l}" href="{BASE_URL}/article/{l}/{slug}">'
+        for l in ARTICLES
+    )
+    hreflangs += f'\n<link rel="alternate" hreflang="x-default" href="{BASE_URL}/article/en/{slug}">'
+    other_articles = [a for a in ARTICLES[lang] if a['id'] != article['id']]
+    related_html = ''.join(
+        f'<a href="{BASE_URL}/article/{lang}/{ARTICLE_SLUGS[a["id"]]}" class="rel-link">{a["title"]}</a>'
+        for a in other_articles
+    )
+    lang_links = ' '.join(
+        f'<a href="{BASE_URL}/article/{l}/{slug}" class="lnk-l{"active" if l==lang else ""}">{LANG_NAMES[l]}</a>'
+        for l in ARTICLES
+    )
+    dir_attr = LANG_DIRS.get(lang, 'ltr')
+    json_ld = f'''{{"@context":"https://schema.org","@type":"Article","headline":"{article["title"]}","description":"{article["description"]}","url":"{BASE_URL}/article/{lang}/{slug}","inLanguage":"{lang}","publisher":{{"@type":"Organization","name":"PhotoVideo.ae","url":"https://photovideo.ae"}},"mainEntityOfPage":"{BASE_URL}/article/{lang}/{slug}"}}'''
+    return f"""<!DOCTYPE html>
+<html lang="{lang}" dir="{dir_attr}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{article['title']} | PhotoVideo.ae</title>
+<meta name="description" content="{article['description']}">
+<meta name="keywords" content="{article['keywords']}">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="{BASE_URL}/article/{lang}/{slug}">
+{hreflangs}
+<meta property="og:type" content="article">
+<meta property="og:title" content="{article['title']}">
+<meta property="og:description" content="{article['description']}">
+<meta property="og:url" content="{BASE_URL}/article/{lang}/{slug}">
+<meta property="og:site_name" content="PhotoVideo.ae">
+<script type="application/ld+json">{json_ld}</script>
+<style>
+*,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
+:root{{--bg:#0d0f18;--s1:#161924;--s2:#1e2130;--border:#2a3050;--text:#e2e6f3;--muted:#7a82a0;--accent:#4f8ef7;--r:12px}}
+body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0 0 60px}}
+header{{background:var(--s1);border-bottom:1px solid var(--border);padding:0 16px}}
+.hdr{{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}}
+.logo{{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:700;font-size:1rem}}
+.logo-icon{{width:32px;height:32px;background:#4f8ef7;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem}}
+.back{{color:var(--accent);text-decoration:none;font-size:.85rem}}
+.back:hover{{text-decoration:underline}}
+main{{max-width:760px;margin:0 auto;padding:32px 16px}}
+h1{{font-size:1.7rem;font-weight:700;margin-bottom:12px;line-height:1.3}}
+.desc{{color:var(--muted);margin-bottom:28px;font-size:.95rem;line-height:1.6}}
+.art-body{{font-size:.93rem;line-height:1.7;color:#c8cde0}}
+.art-body h2{{font-size:1.1rem;font-weight:600;color:var(--text);margin:24px 0 10px}}
+.art-body p{{margin-bottom:12px}}
+.art-body ol,.art-body ul{{margin:10px 0 10px 20px}}
+.art-body li{{margin-bottom:6px}}
+.art-body dl{{margin:10px 0}}
+.art-body dt{{font-weight:600;color:var(--text);margin-top:10px}}
+.art-body dd{{margin-left:16px;color:var(--muted);margin-bottom:4px}}
+.art-body strong{{color:var(--text)}}
+.art-body a{{color:var(--accent);text-decoration:none}}
+.art-body a:hover{{text-decoration:underline}}
+[dir="rtl"] .art-body ol,[dir="rtl"] .art-body ul{{margin:10px 20px 10px 0}}
+.langs{{display:flex;flex-wrap:wrap;gap:6px;margin:24px 0 0}}
+.lnk-l{{padding:4px 10px;border-radius:6px;font-size:.78rem;background:var(--s2);color:var(--muted);text-decoration:none;border:1px solid var(--border)}}
+.lnk-lactive{{background:var(--accent);color:#fff;border-color:var(--accent)}}
+.lnk-l:hover{{color:var(--text)}}
+.related{{margin-top:36px;padding-top:24px;border-top:1px solid var(--border)}}
+.related h3{{font-size:.85rem;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em}}
+.rel-link{{display:block;color:var(--accent);text-decoration:none;font-size:.9rem;margin-bottom:8px}}
+.rel-link:hover{{text-decoration:underline}}
+.cta{{display:inline-block;margin-top:28px;padding:12px 24px;background:var(--accent);color:#fff;border-radius:var(--r);text-decoration:none;font-weight:600;font-size:.95rem}}
+.cta:hover{{opacity:.9}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hdr">
+    <a href="{BASE_URL}" class="logo"><span class="logo-icon">▶</span> YT Downloader</a>
+    <a href="{BASE_URL}" class="back">← Back to Downloader</a>
+  </div>
+</header>
+<main>
+  <h1>{article['title']}</h1>
+  <p class="desc">{article['description']}</p>
+  <div class="art-body">{article['body']}</div>
+  <a href="{BASE_URL}" class="cta">⬇ Try the Downloader</a>
+  <div class="related">
+    <h3>More Guides</h3>
+    {related_html}
+  </div>
+  <div class="langs">{lang_links}</div>
+</main>
+</body>
+</html>"""
+
+
 # ── Routes ────────────────────────────────────────────────────────────────────
 
 @app.get("/")
@@ -127,6 +358,28 @@ async def index():
     return FileResponse(
         "static/index.html",
         headers={"Cache-Control": "no-store, no-cache, must-revalidate"},
+    )
+
+
+@app.get("/article/{slug}")
+async def article_en(slug: str):
+    return await article_page(lang="en", slug=slug)
+
+
+@app.get("/article/{lang}/{slug}")
+async def article_page(lang: str, slug: str):
+    from fastapi.responses import HTMLResponse
+    if lang not in ARTICLES:
+        lang = "en"
+    article_id = SLUG_TO_ID.get(slug)
+    if not article_id:
+        raise HTTPException(status_code=404, detail="Article not found")
+    article = next((a for a in ARTICLES[lang] if a['id'] == article_id), None)
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+    return HTMLResponse(
+        content=_article_html(lang, article),
+        headers={"Cache-Control": "public, max-age=3600"},
     )
 
 

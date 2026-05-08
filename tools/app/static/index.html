@@ -265,6 +265,9 @@ header {
   cursor: pointer; transition: all .15s;
 }
 .art-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.art-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.art-full { font-size: .78rem; color: var(--accent); text-decoration: none; }
+.art-full:hover { text-decoration: underline; }
 /* Modal */
 .overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 100;
@@ -407,24 +410,33 @@ header {
   <div class="art-grid">
 
     <article class="art-card" id="guide-download">
-      <h2 class="art-title">How to Download a YouTube Video</h2>
-      <p class="art-summary">Step-by-step guide to downloading any YouTube video for free in HD quality.</p>
+      <h2 class="art-title" id="art-title-0">How to Download a YouTube Video</h2>
+      <p class="art-summary" id="art-sum-0">Step-by-step guide to downloading any YouTube video for free in HD quality.</p>
       <div class="art-body" id="art-body-0"></div>
-      <button class="art-toggle" onclick="toggleArt(0)" id="art-tog-0">Read more ▼</button>
+      <div class="art-actions">
+        <button class="art-toggle" onclick="toggleArt(0)" id="art-tog-0">Read more ▼</button>
+        <a class="art-full" id="art-link-0" href="/download/article/en/how-to-download-youtube-video">Full article →</a>
+      </div>
     </article>
 
     <article class="art-card" id="guide-cloud">
-      <h2 class="art-title">How to Save a YouTube Video to Google Drive</h2>
-      <p class="art-summary">Upload YouTube videos directly to Google Drive, no local storage required.</p>
+      <h2 class="art-title" id="art-title-1">How to Save a YouTube Video to Google Drive</h2>
+      <p class="art-summary" id="art-sum-1">Upload YouTube videos directly to Google Drive, no local storage required.</p>
       <div class="art-body" id="art-body-1"></div>
-      <button class="art-toggle" onclick="toggleArt(1)" id="art-tog-1">Read more ▼</button>
+      <div class="art-actions">
+        <button class="art-toggle" onclick="toggleArt(1)" id="art-tog-1">Read more ▼</button>
+        <a class="art-full" id="art-link-1" href="/download/article/en/save-youtube-video-to-google-drive">Full article →</a>
+      </div>
     </article>
 
     <article class="art-card" id="guide-device">
-      <h2 class="art-title">How to Download YouTube Videos to PC or Mobile Phone</h2>
-      <p class="art-summary">Save YouTube videos as MP4 files to Windows, Mac, iPhone or Android.</p>
+      <h2 class="art-title" id="art-title-2">How to Download YouTube Videos to PC or Mobile Phone</h2>
+      <p class="art-summary" id="art-sum-2">Save YouTube videos as MP4 files to Windows, Mac, iPhone or Android.</p>
       <div class="art-body" id="art-body-2"></div>
-      <button class="art-toggle" onclick="toggleArt(2)" id="art-tog-2">Read more ▼</button>
+      <div class="art-actions">
+        <button class="art-toggle" onclick="toggleArt(2)" id="art-tog-2">Read more ▼</button>
+        <a class="art-full" id="art-link-2" href="/download/article/en/download-youtube-videos-pc-mobile">Full article →</a>
+      </div>
     </article>
 
   </div>
@@ -806,6 +818,7 @@ function applyLang(code) {
   document.getElementById('lbl-recent').textContent = t.lblRecent;
 
   // Articles
+  const SLUG_MAP = ['how-to-download-youtube-video','save-youtube-video-to-google-drive','download-youtube-videos-pc-mobile'];
   t.articles.forEach((art, i) => {
     const card = document.getElementById(art.id) || document.querySelectorAll('.art-card')[i];
     if (!card) return;
@@ -813,10 +826,12 @@ function applyLang(code) {
     const summaryEl = card.querySelector('.art-summary');
     const bodyEl = document.getElementById(`art-body-${i}`);
     const togEl = document.getElementById(`art-tog-${i}`);
+    const linkEl = document.getElementById(`art-link-${i}`);
     if (titleEl) titleEl.textContent = art.title;
     if (summaryEl) summaryEl.textContent = art.summary;
     if (bodyEl) bodyEl.innerHTML = art.body;
     if (togEl && !togEl.dataset.open) togEl.textContent = t.artReadMore;
+    if (linkEl) linkEl.href = `/download/article/${code}/${SLUG_MAP[i]}`;
   });
 
   document.getElementById('guides-title').textContent = t.guidesTitle;
