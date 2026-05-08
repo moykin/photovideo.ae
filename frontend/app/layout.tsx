@@ -60,6 +60,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-DMNMF9MNFX" />
+        <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-DMNMF9MNFX');` }} />
       </head>
       <body className="min-h-screen flex flex-col">
         <Providers>
