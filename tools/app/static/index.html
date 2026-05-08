@@ -335,7 +335,7 @@ header {
       </div>
       <div id="hdr-user" class="user-chip hidden">
         <strong id="hdr-email"></strong>
-        <button class="btn-xs" id="btn-logout" onclick="location.href='/auth/logout'">Logout</button>
+        <button class="btn-xs" id="btn-logout" onclick="location.href=ROOT+'/auth/logout'">Logout</button>
       </div>
     </div>
   </div>
@@ -391,7 +391,7 @@ header {
         <div class="ci-sub" id="g-sub">Sign in to upload videos directly to your Drive</div>
       </div>
       <div id="g-actions">
-        <button class="btn-gsign" onclick="location.href='/auth/login'">
+        <button class="btn-gsign" onclick="location.href=ROOT+'/auth/login'">
           <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
           <span id="btn-signin-lbl">Sign in with Google</span>
         </button>
@@ -479,6 +479,7 @@ header {
 </div>
 
 <script>
+const ROOT = '/download';
 // ── Language config ─────────────────────────────────────────────────────────
 const LANGS = {
   en: { name: 'English',   flag: '🇬🇧', dir: 'ltr' },
@@ -871,7 +872,7 @@ function updateConnectBlock() {
     document.getElementById('g-sub').textContent = 'Google Drive connected';
     document.getElementById('g-sub').className = 'ci-sub ok';
     document.getElementById('g-actions').innerHTML =
-      `<button class="btn-disc" onclick="location.href='/auth/logout'">${esc(t.disconnect)}</button>`;
+      `<button class="btn-disc" onclick="location.href=ROOT+'/auth/logout'">${esc(t.disconnect)}</button>`;
     document.getElementById('gs-status').textContent = 'Connected ✓';
   } else {
     document.getElementById('g-title').textContent = t.connectTitle;
@@ -879,7 +880,7 @@ function updateConnectBlock() {
     document.getElementById('g-sub').textContent = t.connectSub;
     document.getElementById('g-sub').className = 'ci-sub';
     document.getElementById('g-actions').innerHTML =
-      `<button class="btn-gsign" onclick="location.href='/auth/login'">
+      `<button class="btn-gsign" onclick="location.href=ROOT+'/auth/login'">
         <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
         ${esc(t.signIn)}
       </button>`;
@@ -953,7 +954,7 @@ async function go() {
   showSteps({ status: 'pending', step: 'fetching', step_progress: 0, progress: 2 });
   const body = { url, action: mode, provider };
   if (mode === 'cloud' && folderId) body.folder_id = folderId;
-  const res = await fetch('/api/start', {
+  const res = await fetch(ROOT+'/api/start', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
   });
   if (!res.ok) {
@@ -967,7 +968,7 @@ async function go() {
 async function poll() {
   if (!jobId) return;
   try {
-    const res = await fetch('/api/status/' + jobId);
+    const res = await fetch(ROOT+'/api/status/' + jobId);
     if (!res.ok) {
       clearInterval(pollTimer);
       const t = T[currentLang];
@@ -1031,7 +1032,7 @@ function showReady(j) {
     <div class="ri-icon">✅</div>
     <div class="ri-name">${esc(j.filename || 'video.mp4')}</div>
     <div class="ri-actions">
-      <a href="/api/download/${esc(jobId)}" download class="btn-dl">${esc(t.dlBtn)}</a>
+      <a href="${ROOT}/api/download/${esc(jobId)}" download class="btn-dl">${esc(t.dlBtn)}</a>
       <button class="btn-again" onclick="reset()">${esc(t.anotherVideo)}</button>
     </div></div>`;
 }
@@ -1045,7 +1046,7 @@ function showDone(j) {
     <div class="ri-name">${esc(j.filename || 'video.mp4')}</div>
     <div class="ri-actions">
       <a href="${esc(j.link)}" target="_blank" class="btn-cl">${esc(t.openInDrive)}</a>
-      <a href="/api/download/${esc(jobId)}" download class="btn-dl">${esc(t.dlToo)}</a>
+      <a href="${ROOT}/api/download/${esc(jobId)}" download class="btn-dl">${esc(t.dlToo)}</a>
       <button class="btn-again" onclick="reset()">${esc(t.anotherVideo)}</button>
     </div></div>`;
 }
@@ -1102,7 +1103,7 @@ function oclick(e) { if (e.target === document.getElementById('modal')) closeMod
 
 async function loadFolders(pid) {
   document.getElementById('mlist').innerHTML = '<div class="fempty">Loading...</div>';
-  const r = await fetch('/api/folders?parent_id=' + encodeURIComponent(pid)).then(r => r.json()).catch(() => null);
+  const r = await fetch(ROOT+'/api/folders?parent_id=' + encodeURIComponent(pid)).then(r => r.json()).catch(() => null);
   if (!r) { document.getElementById('mlist').innerHTML = '<div class="fempty">Error loading</div>'; return; }
   mCurrId = r.parent_id; mCurrName = r.parent_name;
   renderBc();
@@ -1145,7 +1146,7 @@ function confirmFolder() {
 }
 
 async function doMoveFile(fileId, targetFolderId) {
-  await fetch(`/api/drive/move/${fileId}`, {
+  await fetch(ROOT+`/api/drive/move/${fileId}`, {
     method: 'PATCH', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ folder_id: targetFolderId }),
   }).catch(() => {});
@@ -1174,7 +1175,7 @@ function showNewFolder() {
 async function doNewFolder() {
   const name = document.getElementById('nfname')?.value?.trim();
   if (!name) return;
-  await fetch('/api/drive/folder', {
+  await fetch(ROOT+'/api/drive/folder', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, parent_id: mCurrId }),
   }).catch(() => {});
@@ -1183,7 +1184,7 @@ async function doNewFolder() {
 
 // ── History ───────────────────────────────────────────────────────────────────
 async function loadHistory() {
-  const r = await fetch('/api/history').then(r => r.json()).catch(() => ({ items: [] }));
+  const r = await fetch(ROOT+'/api/history').then(r => r.json()).catch(() => ({ items: [] }));
   if (!r.items.length) { document.getElementById('hist-card').classList.add('hidden'); return; }
   document.getElementById('hist-card').classList.remove('hidden');
   renderHistory(r.items);
@@ -1204,7 +1205,7 @@ function renderHistory(items) {
       acts += `<a href="${esc(it.link)}" target="_blank" class="btn-hist">${esc(t.open)}</a>`;
       if (it.file_id) acts += `<button class="btn-hist" onclick="startMove('${esc(it.file_id)}')">${esc(t.move)}</button>`;
     } else if (it.downloadable) {
-      acts += `<a href="/api/download/${esc(it.job_id)}" download class="btn-hist">${esc(t.dlBtn)}</a>`;
+      acts += `<a href="${ROOT}/api/download/${esc(it.job_id)}" download class="btn-hist">${esc(t.dlBtn)}</a>`;
     }
     return `<div class="hitem">
       <div class="hitem-icon">${icon}</div>
@@ -1231,7 +1232,7 @@ async function init() {
   currentLang = detectLang();
   applyLang(currentLang);
 
-  const r = await fetch('/api/me').then(r => r.json());
+  const r = await fetch(ROOT+'/api/me').then(r => r.json());
   if (r.google) {
     gConnected = true; gEmail = r.google.email;
     document.getElementById('hdr-user').classList.remove('hidden');
