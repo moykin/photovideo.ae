@@ -322,6 +322,9 @@ header {
 .art-full { font-size: .78rem; color: var(--accent); text-decoration: none; }
 .art-full:hover { text-decoration: underline; }
 .hdr-home { color: var(--muted); font-size: .8rem; text-decoration: none; white-space: nowrap; }
+.disclaimer { display: flex; gap: 14px; background: rgba(122,130,160,.06); border: 1px solid rgba(42,48,80,.9); border-left: 3px solid rgba(122,130,160,.35); border-radius: 10px; padding: 16px; margin: 32px 0 0; font-size: .81rem; line-height: 1.65; color: var(--muted); max-width: 760px; width: 100%; }
+.disc-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+.disclaimer strong { color: var(--text); display: block; margin-bottom: 5px; font-size: .85rem; }
 .hdr-home:hover { color: var(--accent); }
 /* Modal */
 .overlay {
@@ -1517,6 +1520,12 @@ async function init() {
 
 init();
 </script>
+
+<div class="disclaimer">
+  <span class="disc-icon">⚖️</span>
+  <div><strong>Copyright &amp; Fair Use</strong>
+  Downloading videos from YouTube and other platforms is in a legal grey area under platform terms of service. This tool is intended for creating personal backups of content you own, and for legitimate Fair Use purposes — including journalism, commentary, research, and education. Users are solely responsible for complying with applicable laws and the terms of service of the respective platforms. Do not use this service to infringe on copyright.</div>
+</div>
 
 <footer style="text-align:center;padding:24px 16px;font-size:.8rem;color:var(--muted);border-top:1px solid var(--s2);margin-top:40px">
   <a href="https://photovideo.ae/privacy" style="color:var(--muted);text-decoration:underline">Privacy Policy</a>

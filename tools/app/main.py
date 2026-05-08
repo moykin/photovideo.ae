@@ -556,8 +556,8 @@ h1{{font-size:1.7rem;font-weight:700;margin-bottom:12px;line-height:1.3}}
 [dir="rtl"] .art-body ol,[dir="rtl"] .art-body ul{{margin:10px 20px 10px 0}}
 .langs{{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 24px}}
 .lnk-l{{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-size:.82rem;background:var(--s2);color:var(--muted);text-decoration:none;border:1px solid var(--border);transition:all .15s}}
-.lnk-lactive{{background:var(--accent);color:#fff;border-color:var(--accent)}}
-.lnk-l:hover:not(.lnk-lactive){{background:var(--s1);color:var(--text);border-color:#3a4570}}
+.lnk-lactive{{background:linear-gradient(135deg,#3d7bf5,#2a6be6);color:#fff;border-color:#4f8ef7;box-shadow:0 2px 12px rgba(79,142,247,.45),inset 0 1px 0 rgba(255,255,255,.18);font-weight:600;transform:translateY(-1px)}}
+.lnk-l:hover:not(.lnk-lactive){{background:var(--s1);color:var(--text);border-color:#3a4570;transform:translateY(-1px)}}
 .lnk-flag{{font-size:1rem;line-height:1}}
 .lang-label{{font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}}
 .related{{margin-top:36px;padding-top:24px;border-top:1px solid var(--border)}}
@@ -566,6 +566,9 @@ h1{{font-size:1.7rem;font-weight:700;margin-bottom:12px;line-height:1.3}}
 .rel-link:hover{{text-decoration:underline}}
 .cta{{display:inline-block;margin-top:28px;padding:12px 24px;background:var(--accent);color:#fff;border-radius:var(--r);text-decoration:none;font-weight:600;font-size:.95rem}}
 .cta:hover{{opacity:.9}}
+.disclaimer{{display:flex;gap:14px;background:rgba(122,130,160,.06);border:1px solid rgba(42,48,80,.9);border-left:3px solid rgba(122,130,160,.35);border-radius:10px;padding:16px;margin-top:32px;font-size:.81rem;line-height:1.65;color:var(--muted)}}
+.disc-icon{{font-size:1.3rem;flex-shrink:0;margin-top:1px}}
+.disclaimer strong{{color:var(--text);display:block;margin-bottom:5px;font-size:.85rem}}
 #lang-banner{{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px;background:#1a2540;border-bottom:1px solid #2e4080;padding:10px 16px;font-size:.85rem;flex-wrap:wrap}}
 #lang-banner a{{color:#7eb3ff;font-weight:600;text-decoration:none;padding:4px 10px;background:rgba(79,142,247,.15);border-radius:6px;border:1px solid rgba(79,142,247,.3)}}
 #lang-banner a:hover{{background:rgba(79,142,247,.25)}}
@@ -586,6 +589,11 @@ h1{{font-size:1.7rem;font-weight:700;margin-bottom:12px;line-height:1.3}}
   <div class="lang-label">Read in your language</div>
   <div class="langs">{lang_links}</div>
   <div class="art-body">{article['body']}</div>
+  <div class="disclaimer">
+    <span class="disc-icon">⚖️</span>
+    <div><strong>Copyright &amp; Fair Use</strong>
+    Downloading videos from YouTube and other platforms is in a legal grey area under platform terms of service. This tool is intended for creating personal backups of content you own, and for legitimate Fair Use purposes — including journalism, commentary, research, and education. Users are solely responsible for complying with applicable laws and the terms of service of the respective platforms. Do not use this service to infringe on copyright.</div>
+  </div>
   <a href="{BASE_URL}" class="cta">⬇ Try the Downloader</a>
   <div class="related">
     <h3>More Guides</h3>
