@@ -2,8 +2,7 @@ FROM node:20 AS build
 WORKDIR /app
 RUN apt-get update && apt-get install -y python3 make g++ libssl-dev && rm -rf /var/lib/apt/lists/*
 COPY package*.json ./
-RUN npm install
-RUN npm install @swc/core-linux-x64-gnu --no-save --ignore-scripts 2>/dev/null || true
+RUN npm install --include=optional
 COPY . .
 RUN npm run build
 
@@ -11,8 +10,7 @@ FROM node:20 AS production
 WORKDIR /app
 RUN apt-get update && apt-get install -y python3 make g++ libssl-dev && rm -rf /var/lib/apt/lists/*
 COPY package*.json ./
-RUN npm install --only=production
-RUN npm install @swc/core-linux-x64-gnu --no-save --ignore-scripts 2>/dev/null || true
+RUN npm install --only=production --include=optional
 COPY --from=build /app/build ./build
 COPY --from=build /app/config ./config
 COPY --from=build /app/src ./src
