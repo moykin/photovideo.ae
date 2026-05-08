@@ -115,7 +115,6 @@ CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
 REDIRECT_URI = os.environ.get("REDIRECT_URI", "http://localhost:8080/auth/callback")
 SCOPES = [
     "https://www.googleapis.com/auth/drive.file",
-    "https://www.googleapis.com/auth/drive.metadata.readonly",
     "https://www.googleapis.com/auth/userinfo.email",
     "openid",
 ]
@@ -775,40 +774,20 @@ async def me(request: Request):
     return JSONResponse({"google": {"email": data.get("email", "")}})
 
 
-@app.get("/api/folders")
-async def list_folders(request: Request, parent_id: str = "root"):
-    data = _get_session(request)
-    if not data or not data.get("google_connected"):
-        raise HTTPException(status_code=401, detail="Google Drive not connected")
-
-    creds = _creds(data)
-    _refresh_if_needed(creds, data)
-    svc = build("drive", "v3", credentials=creds)
-
+def _get_or_create_app_folder(svc) -> str:
     result = svc.files().list(
-        q=f"'{parent_id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false",
-        fields="files(id,name)",
-        orderBy="name",
-        pageSize=200,
+        q="name='YT2GDrive' and mimeType='application/vnd.google-apps.folder' and trashed=false",
+        fields="files(id)",
+        pageSize=1,
     ).execute()
-
-    parent_name = "My Drive"
-    parent_parent_id = None
-    if parent_id != "root":
-        try:
-            meta = svc.files().get(fileId=parent_id, fields="name,parents").execute()
-            parent_name = meta.get("name", parent_id)
-            parents = meta.get("parents", [])
-            parent_parent_id = parents[0] if parents else "root"
-        except Exception:
-            pass
-
-    return JSONResponse({
-        "folders": result.get("files", []),
-        "parent_id": parent_id,
-        "parent_name": parent_name,
-        "parent_parent_id": parent_parent_id,
-    })
+    files = result.get("files", [])
+    if files:
+        return files[0]["id"]
+    folder = svc.files().create(
+        body={"name": "YT2GDrive", "mimeType": "application/vnd.google-apps.folder"},
+        fields="id",
+    ).execute()
+    return folder["id"]
 
 
 @app.post("/api/start")
@@ -817,8 +796,6 @@ async def start(request: Request, background_tasks: BackgroundTasks):
     url = body.get("url", "").strip()
     action = body.get("action", "download")    # "download" | "cloud"
     provider = body.get("provider", "google")  # "google" | "onedrive" | "dropbox"
-    folder_id = body.get("folder_id") or None
-
     if not url:
         raise HTTPException(status_code=400, detail="URL is required")
 
@@ -834,7 +811,7 @@ async def start(request: Request, background_tasks: BackgroundTasks):
     }
 
     background_tasks.add_task(
-        _process, job_id, url, action, provider, folder_id,
+        _process, job_id, url, action, provider,
         dict(data) if data else None, request.session.get("sid", "")
     )
     return JSONResponse({"job_id": job_id})
@@ -879,45 +856,6 @@ async def get_history(request: Request):
     return JSONResponse({"items": enriched})
 
 
-@app.post("/api/drive/folder")
-async def create_drive_folder(request: Request):
-    body = await request.json()
-    name = body.get("name", "").strip()
-    parent_id = body.get("parent_id", "root")
-    if not name:
-        raise HTTPException(status_code=400, detail="Name required")
-    data = _get_session(request)
-    if not data or not data.get("google_connected"):
-        raise HTTPException(status_code=401, detail="Not connected")
-    creds = _creds(data)
-    _refresh_if_needed(creds, data)
-    svc = build("drive", "v3", credentials=creds)
-    meta = {"name": name, "mimeType": "application/vnd.google-apps.folder"}
-    if parent_id and parent_id != "root":
-        meta["parents"] = [parent_id]
-    folder = svc.files().create(body=meta, fields="id,name").execute()
-    return JSONResponse(folder)
-
-
-@app.patch("/api/drive/move/{file_id}")
-async def move_drive_file(file_id: str, request: Request):
-    body = await request.json()
-    folder_id = body.get("folder_id") or "root"
-    data = _get_session(request)
-    if not data or not data.get("google_connected"):
-        raise HTTPException(status_code=401, detail="Not connected")
-    creds = _creds(data)
-    _refresh_if_needed(creds, data)
-    svc = build("drive", "v3", credentials=creds)
-    file_meta = svc.files().get(fileId=file_id, fields="parents").execute()
-    old_parents = ",".join(file_meta.get("parents", []))
-    svc.files().update(
-        fileId=file_id,
-        addParents=folder_id,
-        removeParents=old_parents,
-        fields="id,parents",
-    ).execute()
-    return JSONResponse({"ok": True})
 
 
 # ── Background worker ─────────────────────────────────────────────────────────
@@ -966,7 +904,7 @@ async def _read_progress(stream, job_id: str):
 
 async def _process(
     job_id: str, url: str, action: str, provider: str,
-    folder_id: Optional[str], creds_data: Optional[dict], sid: str = "",
+    creds_data: Optional[dict], sid: str = "",
 ):
     try:
         jobs[job_id].update({
@@ -1041,7 +979,7 @@ async def _process(
                 "step": "uploading", "step_progress": 0, "progress": 52,
                 "message": "Uploading to Google Drive...", "detail": "0%",
             })
-            await asyncio.to_thread(_upload_gdrive, job_id, creds_data, filepath, filename, folder_id)
+            await asyncio.to_thread(_upload_gdrive, job_id, creds_data, filepath, filename)
             _save_history((creds_data or {}).get("email") or sid, {
                 "job_id": job_id,
                 "filename": jobs[job_id].get("filename", filename),
@@ -1055,14 +993,13 @@ async def _process(
         jobs[job_id].update({"status": "error", "message": str(e)})
 
 
-def _upload_gdrive(job_id, creds_data, filepath, filename, folder_id):
+def _upload_gdrive(job_id, creds_data, filepath, filename):
     c = _creds(creds_data)
     _refresh_if_needed(c, creds_data)
     svc = build("drive", "v3", credentials=c)
 
-    metadata = {"name": filename}
-    if folder_id:
-        metadata["parents"] = [folder_id]
+    folder_id = _get_or_create_app_folder(svc)
+    metadata = {"name": filename, "parents": [folder_id]}
 
     media = MediaFileUpload(filepath, mimetype="video/mp4", resumable=True, chunksize=10 * 1024 * 1024)
     req = svc.files().create(body=metadata, media_body=media, fields="id,name,webViewLink")

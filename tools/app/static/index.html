@@ -193,14 +193,7 @@ header {
   transition: all .15s; flex-shrink: 0;
 }
 .btn-disc:hover { border-color: var(--red); color: var(--red); }
-.folder-trigger {
-  width: 100%; background: var(--bg); border: 1px solid var(--border);
-  color: var(--text); padding: 11px 14px; border-radius: 10px; font-size: .88rem;
-  text-align: left; cursor: pointer; display: flex; align-items: center; gap: 9px;
-  transition: border-color .15s; margin-bottom: 16px;
-}
-.folder-trigger:hover { border-color: var(--accent); }
-.ft-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.folder-info { font-size: .8rem; color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
 .btn-main {
   width: 100%; padding: 13px; border-radius: 10px; border: none;
   font-size: .97rem; font-weight: 600; cursor: pointer;
@@ -345,39 +338,9 @@ header {
 .disclaimer strong { color: var(--text); display: block; margin-bottom: 5px; font-size: .85rem; }
 .hdr-home:hover { color: var(--accent); }
 /* Modal */
-.overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 100;
-  display: flex; align-items: center; justify-content: center; padding: 16px;
-  backdrop-filter: blur(4px);
-}
-.overlay.hidden { display: none; }
-.modal { background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); width: 100%; max-width: 460px; display: flex; flex-direction: column; max-height: 65vh; box-shadow: 0 8px 40px rgba(0,0,0,.5); }
-.mhead { padding: 18px 20px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.mhead h3 { font-size: .95rem; font-weight: 600; }
-.mx { background: none; border: none; color: var(--muted); font-size: 1.1rem; cursor: pointer; padding: 2px 6px; border-radius: 6px; }
-.mx:hover { background: var(--s2); color: var(--text); }
-.bc { padding: 8px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 5px; font-size: .78rem; color: var(--muted); flex-wrap: wrap; min-height: 38px; }
-.bci { cursor: pointer; color: var(--accent); }
-.bci:hover { text-decoration: underline; }
-.bcs { color: var(--border); }
-.flist { flex: 1; overflow-y: auto; padding: 6px 10px; }
-.fi { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: 8px; cursor: pointer; font-size: .87rem; transition: background .1s; }
-.fi:hover { background: var(--s2); }
-.fi-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.fi-arr { color: var(--muted); font-size: .75rem; }
-.fempty { text-align: center; color: var(--muted); padding: 28px; font-size: .85rem; }
-.mfoot { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center; }
-.bsm { padding: 8px 14px; border-radius: 8px; font-size: .83rem; cursor: pointer; border: none; }
-.bsm-sec { background: var(--s2); color: var(--text); border: 1px solid var(--border); }
-.bsm-sec:hover { border-color: var(--accent); color: var(--accent); }
-.bsm-pri { background: var(--accent); color: #fff; }
-.bsm-pri:hover { background: #3a7af0; }
-.nf-wrap { padding: 10px 14px 14px; border-bottom: 1px solid var(--border); }
-.nf-row { display: flex; gap: 6px; margin-top: 8px; }
 .hidden { display: none !important; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .spinner { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; }
-[dir="rtl"] .fi-arr { transform: scaleX(-1); }
 [dir="rtl"] .art-body ol, [dir="rtl"] .art-body ul { margin: 10px 20px 10px 0; }
 </style>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DMNMF9MNFX"></script>
@@ -470,12 +433,7 @@ header {
     </div>
 
     <div id="folder-block" class="hidden">
-      <div class="section-label" id="lbl-folder">Destination folder</div>
-      <button class="folder-trigger" onclick="openModal()" type="button">
-        <span>📁</span>
-        <span class="ft-name" id="fdisplay">My Drive (root)</span>
-        <span style="color:var(--muted);font-size:.75rem">▼</span>
-      </button>
+      <div class="folder-info">📁 <span id="folder-info-txt">Saves to <b>YT2GDrive</b> folder in your Google Drive</span></div>
     </div>
   </div>
 
@@ -649,19 +607,6 @@ header {
   </div>
 </section>
 
-<!-- Folder modal -->
-<div class="overlay hidden" id="modal" onclick="oclick(event)">
-  <div class="modal">
-    <div class="mhead"><h3 id="modal-title">Choose folder</h3><button class="mx" onclick="closeModal()">✕</button></div>
-    <div class="bc" id="mbread"></div>
-    <div class="flist" id="mlist"><div class="fempty">Loading...</div></div>
-    <div class="mfoot">
-      <button class="bsm bsm-sec" onclick="showNewFolder()" id="btn-nf" style="margin-right:auto">+ <span id="lbl-newfolder">New folder</span></button>
-      <button class="bsm bsm-sec" onclick="closeModal()" id="btn-cancel">Cancel</button>
-      <button class="bsm bsm-pri" onclick="confirmFolder()" id="btn-sel-folder">Select</button>
-    </div>
-  </div>
-</div>
 
 <script>
 const ROOT = '/download';
@@ -692,10 +637,8 @@ en: {
   lblProvider:'Storage provider', lblSoon:'Soon',
   connectTitle:'Connect Google Drive', connectSub:'Sign in to upload videos directly to your Drive',
   signIn:'Sign in with Google', disconnect:'Disconnect',
-  lblFolder:'Destination folder', folderDefault:'My Drive (root)',
-  logout:'Logout', lblNewfolder:'New folder', lblCancel:'Cancel', lblSelect:'Select',
-  chooseFolder:'Choose folder', moveFolder:'Move to folder',
-  lblRecent:'Recent Downloads', open:'Open', move:'Move', dlBtn:'⬇ Download',
+  logout:'Logout',
+  lblRecent:'Recent Downloads', open:'Open', dlBtn:'⬇ Download',
   lostSession:'Session lost. Please try again.',
   anotherVideo:'Another video', tryAgain:'Try again', openInDrive:'Open in Drive', dlToo:'⬇ Download too',
   guidesTitle:'How to Download YouTube Videos — Guides',
@@ -751,10 +694,8 @@ hi: {
   lblProvider:'स्टोरेज प्रोवाइडर', lblSoon:'जल्द',
   connectTitle:'Google Drive कनेक्ट करें', connectSub:'अपने Drive में वीडियो अपलोड करने के लिए साइन इन करें',
   signIn:'Google से साइन इन करें', disconnect:'डिसकनेक्ट',
-  lblFolder:'डेस्टिनेशन फोल्डर', folderDefault:'My Drive (रूट)',
-  logout:'लॉगआउट', lblNewfolder:'नया फोल्डर', lblCancel:'रद्द करें', lblSelect:'चुनें',
-  chooseFolder:'फोल्डर चुनें', moveFolder:'फोल्डर में मूव करें',
-  lblRecent:'हाल के डाउनलोड', open:'खोलें', move:'मूव', dlBtn:'⬇ डाउनलोड',
+  logout:'लॉगआउट',
+  lblRecent:'हाल के डाउनलोड', open:'खोलें', dlBtn:'⬇ डाउनलोड',
   lostSession:'सेशन खो गया। कृपया पुनः प्रयास करें।',
   anotherVideo:'दूसरा वीडियो', tryAgain:'पुनः प्रयास', openInDrive:'Drive में खोलें', dlToo:'⬇ डाउनलोड भी करें',
   guidesTitle:'YouTube वीडियो कैसे डाउनलोड करें — गाइड',
@@ -806,10 +747,8 @@ zh: {
   lblProvider:'云存储提供商', lblSoon:'即将推出',
   connectTitle:'连接Google Drive', connectSub:'登录以将视频直接上传到您的Drive',
   signIn:'使用Google登录', disconnect:'断开连接',
-  lblFolder:'目标文件夹', folderDefault:'我的云端硬盘（根目录）',
-  logout:'退出登录', lblNewfolder:'新建文件夹', lblCancel:'取消', lblSelect:'选择',
-  chooseFolder:'选择文件夹', moveFolder:'移动到文件夹',
-  lblRecent:'最近下载', open:'打开', move:'移动', dlBtn:'⬇ 下载',
+  logout:'退出登录',
+  lblRecent:'最近下载', open:'打开', dlBtn:'⬇ 下载',
   lostSession:'会话已丢失，请重试。',
   anotherVideo:'再下一个', tryAgain:'重试', openInDrive:'在Drive中打开', dlToo:'⬇ 同时下载',
   guidesTitle:'如何下载YouTube视频 — 教程',
@@ -861,10 +800,8 @@ ar: {
   lblProvider:'مزود التخزين', lblSoon:'قريباً',
   connectTitle:'ربط Google Drive', connectSub:'سجّل الدخول لرفع المقاطع مباشرة إلى Drive',
   signIn:'تسجيل الدخول بـ Google', disconnect:'قطع الاتصال',
-  lblFolder:'مجلد الوجهة', folderDefault:'My Drive (الجذر)',
-  logout:'تسجيل الخروج', lblNewfolder:'مجلد جديد', lblCancel:'إلغاء', lblSelect:'اختيار',
-  chooseFolder:'اختيار مجلد', moveFolder:'نقل إلى مجلد',
-  lblRecent:'التنزيلات الأخيرة', open:'فتح', move:'نقل', dlBtn:'⬇ تحميل',
+  logout:'تسجيل الخروج',
+  lblRecent:'التنزيلات الأخيرة', open:'فتح', dlBtn:'⬇ تحميل',
   lostSession:'انتهت الجلسة. يرجى المحاولة مجدداً.',
   anotherVideo:'فيديو آخر', tryAgain:'إعادة المحاولة', openInDrive:'فتح في Drive', dlToo:'⬇ تحميل أيضاً',
   guidesTitle:'كيفية تحميل مقاطع يوتيوب — أدلة',
@@ -916,10 +853,8 @@ es: {
   lblProvider:'Proveedor de almacenamiento', lblSoon:'Próximamente',
   connectTitle:'Conectar Google Drive', connectSub:'Inicia sesión para subir vídeos directamente a tu Drive',
   signIn:'Iniciar sesión con Google', disconnect:'Desconectar',
-  lblFolder:'Carpeta de destino', folderDefault:'Mi unidad (raíz)',
-  logout:'Cerrar sesión', lblNewfolder:'Nueva carpeta', lblCancel:'Cancelar', lblSelect:'Seleccionar',
-  chooseFolder:'Elegir carpeta', moveFolder:'Mover a carpeta',
-  lblRecent:'Descargas Recientes', open:'Abrir', move:'Mover', dlBtn:'⬇ Descargar',
+  logout:'Cerrar sesión',
+  lblRecent:'Descargas Recientes', open:'Abrir', dlBtn:'⬇ Descargar',
   lostSession:'Sesión perdida. Por favor inténtalo de nuevo.',
   anotherVideo:'Otro vídeo', tryAgain:'Reintentar', openInDrive:'Abrir en Drive', dlToo:'⬇ Descargar también',
   guidesTitle:'Cómo descargar vídeos de YouTube — Guías',
@@ -971,10 +906,8 @@ de: {
   lblProvider:'Speicheranbieter', lblSoon:'Demnächst',
   connectTitle:'Google Drive verbinden', connectSub:'Anmelden, um Videos direkt in dein Drive hochzuladen',
   signIn:'Mit Google anmelden', disconnect:'Trennen',
-  lblFolder:'Zielordner', folderDefault:'Meine Ablage (Stammverzeichnis)',
-  logout:'Abmelden', lblNewfolder:'Neuer Ordner', lblCancel:'Abbrechen', lblSelect:'Auswählen',
-  chooseFolder:'Ordner auswählen', moveFolder:'In Ordner verschieben',
-  lblRecent:'Zuletzt heruntergeladen', open:'Öffnen', move:'Verschieben', dlBtn:'⬇ Herunterladen',
+  logout:'Abmelden',
+  lblRecent:'Zuletzt heruntergeladen', open:'Öffnen', dlBtn:'⬇ Herunterladen',
   lostSession:'Sitzung verloren. Bitte erneut versuchen.',
   anotherVideo:'Weiteres Video', tryAgain:'Erneut versuchen', openInDrive:'In Drive öffnen', dlToo:'⬇ Auch herunterladen',
   guidesTitle:'YouTube-Videos herunterladen — Anleitungen',
@@ -1026,10 +959,8 @@ fr: {
   lblProvider:'Fournisseur de stockage', lblSoon:'Bientôt',
   connectTitle:'Connecter Google Drive', connectSub:'Connectez-vous pour envoyer des vidéos directement dans votre Drive',
   signIn:'Se connecter avec Google', disconnect:'Déconnecter',
-  lblFolder:'Dossier de destination', folderDefault:'Mon Drive (racine)',
-  logout:'Déconnexion', lblNewfolder:'Nouveau dossier', lblCancel:'Annuler', lblSelect:'Sélectionner',
-  chooseFolder:'Choisir un dossier', moveFolder:'Déplacer vers un dossier',
-  lblRecent:'Téléchargements récents', open:'Ouvrir', move:'Déplacer', dlBtn:'⬇ Télécharger',
+  logout:'Déconnexion',
+  lblRecent:'Téléchargements récents', open:'Ouvrir', dlBtn:'⬇ Télécharger',
   lostSession:'Session perdue. Veuillez réessayer.',
   anotherVideo:'Une autre vidéo', tryAgain:'Réessayer', openInDrive:'Ouvrir dans Drive', dlToo:'⬇ Télécharger aussi',
   guidesTitle:'Comment télécharger des vidéos YouTube — Guides',
@@ -1140,17 +1071,8 @@ function applyLang(code) {
   document.getElementById('lbl-provider').textContent = t.lblProvider;
   document.querySelectorAll('.soon').forEach(el => el.textContent = t.lblSoon);
 
-  // Folder
-  document.getElementById('lbl-folder').textContent = t.lblFolder;
-  if (!folderId) document.getElementById('fdisplay').textContent = t.folderDefault;
-
   // Logout
   document.getElementById('btn-logout').textContent = t.logout;
-
-  // Modal buttons
-  document.getElementById('lbl-newfolder').textContent = t.lblNewfolder;
-  document.getElementById('btn-cancel').textContent = t.lblCancel;
-  document.getElementById('btn-sel-folder').textContent = t.lblSelect;
 
   // History title
   document.getElementById('lbl-recent').textContent = t.lblRecent;
@@ -1234,10 +1156,7 @@ function toggleArt(i) {
 // ── State ─────────────────────────────────────────────────────────────────────
 let mode = 'download', provider = 'google';
 let gConnected = false, gEmail = '';
-let folderId = null, folderName = 'My Drive (root)';
 let jobId = null, pollTimer = null;
-let mCurrId = 'root', mCurrName = 'My Drive', mStack = [];
-let moveTargetFileId = null;
 
 // ── Input ─────────────────────────────────────────────────────────────────────
 function onUrl() {
@@ -1629,7 +1548,6 @@ async function go() {
   document.getElementById('rbox').style.display = 'none';
   showSteps({ status: 'pending', step: 'fetching', step_progress: 0, progress: 2 });
   const body = { url, action: mode, provider };
-  if (mode === 'cloud' && folderId) body.folder_id = folderId;
   const res = await fetch(ROOT+'/api/start', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
   });
@@ -1764,100 +1682,6 @@ function shake() {
   setTimeout(() => e.style.borderColor = '', 1500);
 }
 
-// ── Modal ─────────────────────────────────────────────────────────────────────
-function openModal() {
-  mStack = [];
-  const t = T[currentLang];
-  document.getElementById('modal-title').textContent = moveTargetFileId ? t.moveFolder : t.chooseFolder;
-  document.getElementById('modal').classList.remove('hidden');
-  loadFolders('root');
-}
-function closeModal() {
-  document.getElementById('modal').classList.add('hidden');
-  moveTargetFileId = null;
-}
-function oclick(e) { if (e.target === document.getElementById('modal')) closeModal(); }
-
-async function loadFolders(pid) {
-  document.getElementById('mlist').innerHTML = '<div class="fempty">Loading...</div>';
-  const r = await fetch(ROOT+'/api/folders?parent_id=' + encodeURIComponent(pid)).then(r => r.json()).catch(() => null);
-  if (!r) { document.getElementById('mlist').innerHTML = '<div class="fempty">Error loading</div>'; return; }
-  mCurrId = r.parent_id; mCurrName = r.parent_name;
-  renderBc();
-  const l = document.getElementById('mlist');
-  if (!r.folders.length) { l.innerHTML = '<div class="fempty">No folders here</div>'; return; }
-  l.innerHTML = r.folders.map(f =>
-    `<div class="fi" onclick="drill('${esc(f.id)}','${esc(f.name.replace(/'/g, "\\'"))}')">
-      <span>📁</span><span class="fi-name">${esc(f.name)}</span><span class="fi-arr">›</span>
-    </div>`).join('');
-}
-
-function renderBc() {
-  const parts = [{ id: 'root', name: 'My Drive' }, ...mStack];
-  if (mCurrId !== 'root') parts.push({ id: mCurrId, name: mCurrName });
-  document.getElementById('mbread').innerHTML = parts.map((p, i) => {
-    const last = i === parts.length - 1;
-    return last
-      ? `<span style="color:var(--text)">${esc(p.name)}</span>`
-      : `<span class="bci" onclick="jump(${i})">${esc(p.name)}</span><span class="bcs">›</span>`;
-  }).join('');
-}
-
-function drill(id, name) { mStack.push({ id: mCurrId, name: mCurrName }); loadFolders(id); }
-function jump(i) {
-  const parts = [{ id: 'root', name: 'My Drive' }, ...mStack];
-  const t = parts[i]; mStack = parts.slice(1, i); loadFolders(t.id);
-}
-
-function confirmFolder() {
-  if (moveTargetFileId) {
-    doMoveFile(moveTargetFileId, mCurrId === 'root' ? 'root' : mCurrId);
-    moveTargetFileId = null;
-    closeModal(); return;
-  }
-  const t = T[currentLang];
-  folderId = mCurrId === 'root' ? null : mCurrId;
-  folderName = mCurrId === 'root' ? t.folderDefault : mCurrName;
-  document.getElementById('fdisplay').textContent = folderName;
-  closeModal();
-}
-
-async function doMoveFile(fileId, targetFolderId) {
-  await fetch(ROOT+`/api/drive/move/${fileId}`, {
-    method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ folder_id: targetFolderId }),
-  }).catch(() => {});
-  loadHistory();
-}
-
-function startMove(fileId) { moveTargetFileId = fileId; openModal(); }
-
-function showNewFolder() {
-  const existing = document.getElementById('nf-wrap');
-  if (existing) { existing.remove(); return; }
-  const wrap = document.createElement('div');
-  wrap.id = 'nf-wrap'; wrap.className = 'nf-wrap';
-  wrap.innerHTML = `
-    <div style="font-size:.8rem;color:var(--muted);margin-bottom:6px">"${esc(mCurrName)}"</div>
-    <input id="nfname" class="url-input" placeholder="Folder name..." style="font-size:.85rem;padding:9px 12px"
-      onkeydown="if(event.key==='Enter')doNewFolder();if(event.key==='Escape')this.closest('#nf-wrap').remove()">
-    <div class="nf-row">
-      <button class="bsm bsm-pri" onclick="doNewFolder()">Create</button>
-      <button class="bsm bsm-sec" onclick="document.getElementById('nf-wrap').remove()">Cancel</button>
-    </div>`;
-  document.getElementById('mlist').prepend(wrap);
-  wrap.querySelector('input').focus();
-}
-
-async function doNewFolder() {
-  const name = document.getElementById('nfname')?.value?.trim();
-  if (!name) return;
-  await fetch(ROOT+'/api/drive/folder', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, parent_id: mCurrId }),
-  }).catch(() => {});
-  loadFolders(mCurrId);
-}
 
 // ── History ───────────────────────────────────────────────────────────────────
 async function loadHistory() {
@@ -1880,7 +1704,6 @@ function renderHistory(items) {
     let acts = '';
     if (it.action === 'cloud' && it.link) {
       acts += `<a href="${esc(it.link)}" target="_blank" class="btn-hist">${esc(t.open)}</a>`;
-      if (it.file_id) acts += `<button class="btn-hist" onclick="startMove('${esc(it.file_id)}')">${esc(t.move)}</button>`;
     } else if (it.downloadable) {
       acts += `<a href="${ROOT}/api/download/${esc(it.job_id)}" download class="btn-hist">${esc(t.dlBtn)}</a>`;
     }
@@ -1915,7 +1738,7 @@ async function init() {
     document.getElementById('hdr-user').classList.remove('hidden');
     document.getElementById('hdr-email').textContent = gEmail;
     document.getElementById('folder-block').classList.remove('hidden');
-    updateConnectBlock();
+    updateConnectBlock(); // shows "Saves to YT2GDrive folder" info
   }
   loadHistory();
 }
