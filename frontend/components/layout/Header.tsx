@@ -14,6 +14,7 @@ const navLinks = [
   { href: '/videographers', label: 'Videographers', icon: Video },
   { href: '/feed', label: 'Feed', icon: BookOpen },
   { href: '/blog', label: 'Blog', icon: Newspaper },
+  { href: '/download', label: 'YT Downloader', icon: Download, external: true },
 ];
 
 export function Header() {
@@ -52,15 +53,25 @@ export function Header() {
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className="btn-ghost text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-              >
-                {label}
-              </Link>
-            ))}
+            {navLinks.map(({ href, label, external }) =>
+              external ? (
+                <a
+                  key={href}
+                  href={href}
+                  className="btn-ghost text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                >
+                  {label}
+                </a>
+              ) : (
+                <Link
+                  key={href}
+                  href={href}
+                  className="btn-ghost text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                >
+                  {label}
+                </Link>
+              )
+            )}
           </nav>
 
           {/* Right actions */}
@@ -132,17 +143,29 @@ export function Header() {
       {/* Mobile nav */}
       {open && (
         <div className="md:hidden border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950 px-4 py-4 space-y-1">
-          {navLinks.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium transition-colors"
-              onClick={() => setOpen(false)}
-            >
-              <Icon className="h-5 w-5" />
-              {label}
-            </Link>
-          ))}
+          {navLinks.map(({ href, label, icon: Icon, external }) =>
+            external ? (
+              <a
+                key={href}
+                href={href}
+                className="flex items-center gap-3 rounded-xl px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                <Icon className="h-5 w-5" />
+                {label}
+              </a>
+            ) : (
+              <Link
+                key={href}
+                href={href}
+                className="flex items-center gap-3 rounded-xl px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                <Icon className="h-5 w-5" />
+                {label}
+              </Link>
+            )
+          )}
           {!user && (
             <div className="pt-2 flex flex-col gap-2">
               <Link href="/auth/login" className="btn-secondary w-full" onClick={() => setOpen(false)}>Sign In</Link>
