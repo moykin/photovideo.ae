@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI, Request, BackgroundTasks, HTTPException
-from fastapi.responses import RedirectResponse, JSONResponse, FileResponse
+from fastapi.responses import RedirectResponse, JSONResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 import google.oauth2.credentials
@@ -20,6 +20,89 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
 app = FastAPI(root_path=os.environ.get("ROOT_PATH", ""))
+
+# ── OG Image generator ────────────────────────────────────────────────────────
+
+def _generate_og_image() -> bytes:
+    from PIL import Image, ImageDraw, ImageFont
+    import io
+
+    W, H = 1200, 630
+    img = Image.new("RGB", (W, H), "#0d0f18")
+    draw = ImageDraw.Draw(img)
+
+    # Gradient-like accent bar on top
+    for i in range(6):
+        draw.rectangle([(0, i), (W, i + 1)],
+                       fill=f"#{max(0,79-i*5):02x}{max(0,142-i*5):02x}{min(255,247):02x}")
+
+    # Left glow blob
+    for r in range(200, 0, -4):
+        alpha = int(18 * (1 - r / 200))
+        draw.ellipse([(-r + 180, H // 2 - r), (180 + r, H // 2 + r)],
+                     fill=(79, 142, 247, alpha))
+
+    # Right glow blob
+    for r in range(160, 0, -4):
+        alpha = int(14 * (1 - r / 160))
+        draw.ellipse([(W - 180 - r, 80 - r), (W - 180 + r, 80 + r)],
+                     fill=(255, 68, 68, alpha))
+
+    # Font setup
+    font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    font_bold_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+    try:
+        font_huge  = ImageFont.truetype(font_bold_path, 72)
+        font_large = ImageFont.truetype(font_bold_path, 44)
+        font_med   = ImageFont.truetype(font_path, 30)
+        font_small = ImageFont.truetype(font_path, 24)
+        font_xs    = ImageFont.truetype(font_path, 20)
+    except Exception:
+        font_huge = font_large = font_med = font_small = font_xs = ImageFont.load_default()
+
+    # ▶ icon circle
+    draw.ellipse([(60, 60), (140, 140)], fill="#4f8ef7")
+    draw.polygon([(92, 82), (92, 118), (128, 100)], fill="white")
+
+    # Site name
+    draw.text((160, 72), "photovideo.ae", font=font_med, fill="#7a82a0")
+
+    # Main title
+    draw.text((60, 170), "Video", font=font_huge, fill="#e2e6f3")
+    draw.text((60, 255), "Downloader", font=font_huge, fill="#4f8ef7")
+
+    # Subtitle
+    draw.text((60, 365), "YouTube · Instagram · TikTok", font=font_large, fill="#c8cde0")
+    draw.text((60, 420), "and 1000+ other sites", font=font_med, fill="#7a82a0")
+
+    # Feature pills
+    pills = [("✓ Free", "#1a3a1a", "#34c77b"), ("✓ HD & 4K", "#1a2a3a", "#4f8ef7"), ("✓ Google Drive", "#2a1a2a", "#a855f7")]
+    px = 60
+    for label, bg, fg in pills:
+        bbox = draw.textbbox((0, 0), label, font=font_small)
+        pw = bbox[2] - bbox[0] + 32
+        draw.rounded_rectangle([(px, 490), (px + pw, 530)], radius=20, fill=bg, outline=fg, width=1)
+        draw.text((px + 16, 494), label, font=font_small, fill=fg)
+        px += pw + 14
+
+    # Right side: platform cards
+    cards = [
+        ("▶  YouTube",  "#ff4444", "#1a0a0a"),
+        ("📷  Instagram", "#e1306c", "#1a0a12"),
+        ("♪  TikTok",    "#69c9d0", "#0a1a1a"),
+    ]
+    cx, cy = 820, 200
+    for label, fg, bg in cards:
+        draw.rounded_rectangle([(cx, cy), (cx + 300, cy + 72)], radius=16, fill=bg, outline=fg, width=1)
+        draw.text((cx + 24, cy + 18), label, font=font_large, fill=fg)
+        cy += 96
+
+    # Bottom URL
+    draw.text((60, 580), "photovideo.ae/download", font=font_xs, fill="#4a5068")
+
+    buf = io.BytesIO()
+    img.save(buf, "PNG", optimize=True)
+    return buf.getvalue()
 app.add_middleware(
     SessionMiddleware,
     secret_key=os.environ.get("SECRET_KEY", secrets.token_hex(32)),
@@ -352,6 +435,17 @@ h1{{font-size:1.7rem;font-weight:700;margin-bottom:12px;line-height:1.3}}
 
 
 # ── Routes ────────────────────────────────────────────────────────────────────
+
+_og_image_cache: bytes | None = None
+
+@app.get("/og-image.png")
+async def og_image():
+    global _og_image_cache
+    if _og_image_cache is None:
+        _og_image_cache = _generate_og_image()
+    return Response(content=_og_image_cache, media_type="image/png",
+                    headers={"Cache-Control": "public, max-age=86400"})
+
 
 @app.get("/")
 async def index():

@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 # ffmpeg нужен yt-dlp для склейки видео+аудио
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg wget ca-certificates \
+    ffmpeg wget ca-certificates fonts-dejavu-core \
     && wget -q -O /usr/local/bin/yt-dlp \
        https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
     && chmod +x /usr/local/bin/yt-dlp \
