@@ -501,7 +501,9 @@ def _article_html(lang: str, article: dict) -> str:
         for l in ARTICLES
     )
     dir_attr = LANG_DIRS.get(lang, 'ltr')
-    json_ld = f'''{{"@context":"https://schema.org","@type":"Article","headline":"{article["title"]}","description":"{article["description"]}","url":"{BASE_URL}/article/{lang}/{slug}","inLanguage":"{lang}","publisher":{{"@type":"Organization","name":"PhotoVideo.ae","url":"https://photovideo.ae"}},"mainEntityOfPage":"{BASE_URL}/article/{lang}/{slug}"}}'''
+    pub_date = "2025-06-01"
+    mod_date = "2026-05-09"
+    json_ld = f'''{{"@context":"https://schema.org","@type":"Article","headline":"{article["title"]}","description":"{article["description"]}","url":"{BASE_URL}/article/{lang}/{slug}","inLanguage":"{lang}","datePublished":"{pub_date}","dateModified":"{mod_date}","author":{{"@type":"Organization","name":"PhotoVideo.ae","url":"https://photovideo.ae"}},"publisher":{{"@type":"Organization","name":"PhotoVideo.ae","url":"https://photovideo.ae","logo":{{"@type":"ImageObject","url":"{BASE_URL}/og-image.png"}}}},"image":"{BASE_URL}/og-image.png","mainEntityOfPage":"{BASE_URL}/article/{lang}/{slug}"}}'''
     return f"""<!DOCTYPE html>
 <html lang="{lang}" dir="{dir_attr}">
 <head>
@@ -518,6 +520,13 @@ def _article_html(lang: str, article: dict) -> str:
 <meta property="og:description" content="{article['description']}">
 <meta property="og:url" content="{BASE_URL}/article/{lang}/{slug}">
 <meta property="og:site_name" content="PhotoVideo.ae">
+<meta property="og:image" content="{BASE_URL}/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{article['title']}">
+<meta name="twitter:description" content="{article['description']}">
+<meta name="twitter:image" content="{BASE_URL}/og-image.png">
 <script type="application/ld+json">{json_ld}</script>
 <style>
 *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
@@ -589,6 +598,31 @@ async def og_image():
         _og_image_cache = _generate_og_image()
     return Response(content=_og_image_cache, media_type="image/png",
                     headers={"Cache-Control": "public, max-age=86400"})
+
+
+@app.get("/robots.txt", response_class=Response)
+async def robots_txt():
+    content = f"User-agent: *\nAllow: /\nSitemap: {BASE_URL}/sitemap.xml\n"
+    return Response(content=content, media_type="text/plain",
+                    headers={"Cache-Control": "public, max-age=86400"})
+
+
+@app.get("/sitemap.xml", response_class=Response)
+async def sitemap_xml():
+    mod = "2026-05-09"
+    urls = [f"  <url><loc>{BASE_URL}/</loc><lastmod>{mod}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"]
+    for slug in ARTICLE_SLUGS.values():
+        for lang in ARTICLES:
+            urls.append(
+                f"  <url><loc>{BASE_URL}/article/{lang}/{slug}</loc>"
+                f"<lastmod>{mod}</lastmod><changefreq>monthly</changefreq>"
+                f"<priority>0.8</priority></url>"
+            )
+    body = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    body += '\n'.join(urls)
+    body += '\n</urlset>'
+    return Response(content=body, media_type="application/xml",
+                    headers={"Cache-Control": "public, max-age=3600"})
 
 
 @app.get("/")

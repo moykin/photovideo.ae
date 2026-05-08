@@ -28,6 +28,9 @@ export const metadata: Metadata = {
   authors: [{ name: 'PhotoVideo.ae' }],
   creator: 'PhotoVideo.ae',
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://photovideo.ae'),
+  alternates: {
+    canonical: 'https://photovideo.ae',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_AE',
@@ -35,13 +38,13 @@ export const metadata: Metadata = {
     siteName: 'PhotoVideo.ae',
     title: 'PhotoVideo.ae — Book Photographers & Videographers in UAE',
     description: 'Find and book the best photographers and videographers in UAE.',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
+    images: [{ url: 'https://photovideo.ae/download/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'PhotoVideo.ae',
     description: 'Find and book the best photographers and videographers in UAE.',
-    images: ['/og-image.jpg'],
+    images: ['https://photovideo.ae/download/og-image.png'],
   },
   robots: {
     index: true,
@@ -62,6 +65,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="manifest" href="/manifest.json" />
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-DMNMF9MNFX" />
         <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-DMNMF9MNFX');` }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "PhotoVideo.ae",
+          "url": "https://photovideo.ae",
+          "logo": "https://photovideo.ae/download/og-image.png",
+          "description": "UAE's creative marketplace for photographers and videographers. Book professionals in Dubai, Abu Dhabi and across the UAE.",
+          "sameAs": ["https://photovideo.ae/download"],
+          "areaServed": { "@type": "Country", "name": "United Arab Emirates" },
+        }) }} />
       </head>
       <body className="min-h-screen flex flex-col">
         <Providers>
