@@ -754,7 +754,7 @@ async def callback(request: Request, code: str, state: str):
     })
     _sessions[sid] = existing
     request.session["sid"] = sid
-    return RedirectResponse("/")
+    return RedirectResponse("/download")
 
 
 @app.get("/auth/logout")
