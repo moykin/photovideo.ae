@@ -212,12 +212,10 @@ header {
 .game-hdr { display: flex; justify-content: space-between; align-items: center; font-size: .8rem; }
 .game-hdr span:first-child { font-weight: 500; color: var(--text); }
 .game-score { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
-#gcanvas { border-radius: 8px; display: block; touch-action: none; width: 100%; height: auto; }
-.dpad { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; }
-.dpad-mid { display: contents; }
-.dpad-btn { flex: 1; max-width: 80px; height: 36px; background: var(--s1); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; touch-action: manipulation; user-select: none; -webkit-user-select: none; transition: background .08s, transform .08s; -webkit-tap-highlight-color: transparent; }
+#gcanvas { border-radius: 8px; display: block; touch-action: none; width: 100%; }
+.dpad { display: flex; flex-direction: row; align-items: center; gap: 6px; }
+.dpad-btn { flex: 1; height: 36px; background: var(--s1); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; touch-action: manipulation; user-select: none; -webkit-user-select: none; transition: background .08s, transform .08s; -webkit-tap-highlight-color: transparent; }
 .dpad-btn:active { background: var(--accent); border-color: var(--accent); transform: scale(0.95); }
-.dpad-center { display: none; }
 .game-tip { font-size: .68rem; color: var(--muted); text-align: center; }
 /* Steps */
 .steps-wrap { margin-top: 22px; display: none; }
@@ -488,12 +486,12 @@ header {
     </div>
     <canvas id="gcanvas"></canvas>
     <div class="dpad">
-      <button class="dpad-btn" id="gbtn-l" aria-label="Left">◀</button>
-      <button class="dpad-btn" id="gbtn-u" aria-label="Up">▲</button>
-      <button class="dpad-btn" id="gbtn-d" aria-label="Down">▼</button>
-      <button class="dpad-btn" id="gbtn-r" aria-label="Right">▶</button>
+      <button class="dpad-btn" id="gbtn-l">◀</button>
+      <button class="dpad-btn" id="gbtn-u">▲</button>
+      <button class="dpad-btn" id="gbtn-d">▼</button>
+      <button class="dpad-btn" id="gbtn-r">▶</button>
     </div>
-    <div class="game-tip">Arrow keys · WASD · swipe on canvas</div>
+    <div class="game-tip">Arrow keys · WASD · swipe</div>
   </div>
 </div>
 
