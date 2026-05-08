@@ -100,8 +100,7 @@ header {
   background: var(--s2); border: 1px solid var(--border);
   border-radius: 100px; padding: 5px 14px; font-size: .8rem; color: var(--muted);
 }
-.art-card-pro { border-color:rgba(79,142,247,.4);background:linear-gradient(135deg,var(--s1),rgba(79,142,247,.06)); }
-.art-card-pro-badge { display:inline-block;font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:100px;background:rgba(79,142,247,.18);color:#7ab4ff;margin-bottom:10px;border:1px solid rgba(79,142,247,.3); }
+.art-card-pro { border-color:rgba(79,142,247,.3); background:linear-gradient(135deg,var(--s1),rgba(79,142,247,.05)); }
 .pro-banner {
   display:flex;align-items:center;gap:12px;margin:18px auto 0;padding:12px 18px;
   background:linear-gradient(135deg,rgba(79,142,247,.12),rgba(168,85,247,.1));
@@ -256,18 +255,33 @@ header {
 /* Articles */
 .articles-outer { width: 100%; max-width: 760px; padding: 40px 16px 0; }
 .articles-outer h2.sec-title {
-  font-size: 1.15rem; font-weight: 700; margin-bottom: 20px;
-  color: var(--text);
+  font-size: 1.15rem; font-weight: 700; margin-bottom: 20px; color: var(--text);
 }
-.art-grid { display: grid; gap: 16px; }
+.art-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+@media(max-width:560px){ .art-grid { grid-template-columns: 1fr; } }
 .art-card {
   background: var(--s1); border: 1px solid var(--border); border-radius: var(--r);
-  padding: 22px; overflow: hidden;
+  padding: 18px 20px 16px; display: flex; flex-direction: column; overflow: hidden;
+  transition: border-color .2s, box-shadow .2s;
 }
-.art-card h2 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: var(--text); }
-.art-summary { font-size: .85rem; color: var(--muted); margin-bottom: 14px; line-height: 1.55; }
+.art-card:hover { border-color: rgba(79,142,247,.4); box-shadow: 0 4px 20px rgba(0,0,0,.3); }
+.art-card-wide { grid-column: 1 / -1; flex-direction: row; gap: 20px; align-items: flex-start; }
+@media(max-width:560px){ .art-card-wide { flex-direction: column; } }
+.art-card-wide .art-wide-body { flex: 1; display: flex; flex-direction: column; }
+.art-cat {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: .7rem; font-weight: 700; padding: 3px 9px; border-radius: 100px;
+  margin-bottom: 10px; width: fit-content; letter-spacing: .03em; text-transform: uppercase;
+}
+.art-cat-yt  { background: rgba(255,50,50,.12); color: #ff6060; border: 1px solid rgba(255,50,50,.25); }
+.art-cat-tt  { background: rgba(105,201,208,.12); color: #69c9d0; border: 1px solid rgba(105,201,208,.25); }
+.art-cat-ig  { background: rgba(225,48,108,.12); color: #f06292; border: 1px solid rgba(225,48,108,.25); }
+.art-cat-gen { background: rgba(52,199,123,.12); color: #34c77b; border: 1px solid rgba(52,199,123,.25); }
+.art-cat-pro { background: rgba(79,142,247,.15); color: #7ab4ff; border: 1px solid rgba(79,142,247,.3); }
+.art-card h2 { font-size: .95rem; font-weight: 700; margin-bottom: 7px; color: var(--text); line-height: 1.35; }
+.art-summary { font-size: .82rem; color: var(--muted); margin-bottom: 0; line-height: 1.55; flex: 1; }
 .art-body {
-  font-size: .85rem; line-height: 1.7; color: var(--muted);
+  font-size: .83rem; line-height: 1.7; color: var(--muted);
   max-height: 0; overflow: hidden; transition: max-height .4s ease;
 }
 .art-body.open { max-height: 2000px; }
@@ -279,12 +293,25 @@ header {
 .art-body dd { margin-left: 14px; margin-bottom: 4px; }
 .art-body strong { color: var(--text); }
 .art-body code { background: var(--s2); padding: 1px 5px; border-radius: 4px; font-family: monospace; font-size: .82rem; }
-.art-toggle {
-  margin-top: 12px; background: none; border: 1px solid var(--border);
-  color: var(--muted); padding: 6px 14px; border-radius: 8px; font-size: .78rem;
-  cursor: pointer; transition: all .15s;
+.art-footer { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.art-langs { display: flex; gap: 4px; flex-wrap: wrap; }
+.art-lang-chip {
+  font-size: .68rem; padding: 2px 7px; border-radius: 100px;
+  background: var(--s2); border: 1px solid var(--border); color: var(--muted);
+  display: flex; align-items: center; gap: 3px; white-space: nowrap;
 }
-.art-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.art-actions { display: flex; align-items: center; gap: 10px; }
+.art-toggle {
+  background: none; border: none; color: var(--muted); font-size: .75rem;
+  cursor: pointer; padding: 0; transition: color .15s;
+}
+.art-toggle:hover { color: var(--accent); }
+.art-full {
+  font-size: .8rem; color: var(--accent); text-decoration: none; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px; margin-left: auto;
+}
+.art-full:hover { text-decoration: underline; }
+.art-pro-icon { font-size: 2.5rem; flex-shrink: 0; margin-top: 2px; }
 .platform-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
 .pbadge { font-size: .72rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
 .pbadge-yt  { background: rgba(255,0,0,.15); color: #ff4444; border: 1px solid rgba(255,0,0,.25); }
@@ -455,73 +482,117 @@ header {
   <div class="art-grid">
 
     <article class="art-card" id="guide-download">
+      <div class="art-cat art-cat-yt">▶ YouTube</div>
       <h2 class="art-title" id="art-title-0">How to Download a YouTube Video</h2>
       <p class="art-summary" id="art-sum-0">Step-by-step guide to downloading any YouTube video for free in HD quality.</p>
       <div class="art-body" id="art-body-0"></div>
-      <div class="art-actions">
-        <button class="art-toggle" onclick="toggleArt(0)" id="art-tog-0">Read more ▼</button>
-        <a class="art-full" id="art-link-0" href="/download/article/en/how-to-download-youtube-video">Full article →</a>
+      <div class="art-footer">
+        <div class="art-langs">
+          <span class="art-lang-chip">🇬🇧 EN</span><span class="art-lang-chip">🇮🇳 HI</span><span class="art-lang-chip">🇨🇳 ZH</span><span class="art-lang-chip">🇸🇦 AR</span><span class="art-lang-chip">🇪🇸 ES</span><span class="art-lang-chip">🇩🇪 DE</span><span class="art-lang-chip">🇫🇷 FR</span>
+        </div>
+        <div class="art-actions">
+          <button class="art-toggle" onclick="toggleArt(0)" id="art-tog-0">Preview ▼</button>
+          <a class="art-full" id="art-link-0" href="/download/article/en/how-to-download-youtube-video">Full article →</a>
+        </div>
       </div>
     </article>
 
     <article class="art-card" id="guide-cloud">
+      <div class="art-cat art-cat-yt">▶ YouTube</div>
       <h2 class="art-title" id="art-title-1">How to Save a YouTube Video to Google Drive</h2>
       <p class="art-summary" id="art-sum-1">Upload YouTube videos directly to Google Drive, no local storage required.</p>
       <div class="art-body" id="art-body-1"></div>
-      <div class="art-actions">
-        <button class="art-toggle" onclick="toggleArt(1)" id="art-tog-1">Read more ▼</button>
-        <a class="art-full" id="art-link-1" href="/download/article/en/save-youtube-video-to-google-drive">Full article →</a>
+      <div class="art-footer">
+        <div class="art-langs">
+          <span class="art-lang-chip">🇬🇧 EN</span><span class="art-lang-chip">🇮🇳 HI</span><span class="art-lang-chip">🇨🇳 ZH</span><span class="art-lang-chip">🇸🇦 AR</span><span class="art-lang-chip">🇪🇸 ES</span><span class="art-lang-chip">🇩🇪 DE</span><span class="art-lang-chip">🇫🇷 FR</span>
+        </div>
+        <div class="art-actions">
+          <button class="art-toggle" onclick="toggleArt(1)" id="art-tog-1">Preview ▼</button>
+          <a class="art-full" id="art-link-1" href="/download/article/en/save-youtube-video-to-google-drive">Full article →</a>
+        </div>
       </div>
     </article>
 
     <article class="art-card" id="guide-device">
+      <div class="art-cat art-cat-yt">▶ YouTube</div>
       <h2 class="art-title" id="art-title-2">How to Download YouTube Videos to PC or Mobile Phone</h2>
       <p class="art-summary" id="art-sum-2">Save YouTube videos as MP4 files to Windows, Mac, iPhone or Android.</p>
       <div class="art-body" id="art-body-2"></div>
-      <div class="art-actions">
-        <button class="art-toggle" onclick="toggleArt(2)" id="art-tog-2">Read more ▼</button>
-        <a class="art-full" id="art-link-2" href="/download/article/en/download-youtube-videos-pc-mobile">Full article →</a>
+      <div class="art-footer">
+        <div class="art-langs">
+          <span class="art-lang-chip">🇬🇧 EN</span><span class="art-lang-chip">🇮🇳 HI</span><span class="art-lang-chip">🇨🇳 ZH</span><span class="art-lang-chip">🇸🇦 AR</span><span class="art-lang-chip">🇪🇸 ES</span><span class="art-lang-chip">🇩🇪 DE</span><span class="art-lang-chip">🇫🇷 FR</span>
+        </div>
+        <div class="art-actions">
+          <button class="art-toggle" onclick="toggleArt(2)" id="art-tog-2">Preview ▼</button>
+          <a class="art-full" id="art-link-2" href="/download/article/en/download-youtube-videos-pc-mobile">Full article →</a>
+        </div>
       </div>
     </article>
 
     <article class="art-card" id="guide-tiktok">
+      <div class="art-cat art-cat-tt">♪ TikTok</div>
       <h2 class="art-title" id="art-title-3">How to Download TikTok Videos Free</h2>
       <p class="art-summary" id="art-sum-3">Download any TikTok video to your phone or PC for free. No watermark, no app needed.</p>
       <div class="art-body" id="art-body-3"></div>
-      <div class="art-actions">
-        <button class="art-toggle" onclick="toggleArt(3)" id="art-tog-3">Read more ▼</button>
-        <a class="art-full" id="art-link-3" href="/download/article/en/how-to-download-tiktok-video">Full article →</a>
+      <div class="art-footer">
+        <div class="art-langs">
+          <span class="art-lang-chip">🇬🇧 EN</span><span class="art-lang-chip">🇮🇳 HI</span><span class="art-lang-chip">🇨🇳 ZH</span><span class="art-lang-chip">🇸🇦 AR</span><span class="art-lang-chip">🇪🇸 ES</span><span class="art-lang-chip">🇩🇪 DE</span><span class="art-lang-chip">🇫🇷 FR</span>
+        </div>
+        <div class="art-actions">
+          <button class="art-toggle" onclick="toggleArt(3)" id="art-tog-3">Preview ▼</button>
+          <a class="art-full" id="art-link-3" href="/download/article/en/how-to-download-tiktok-video">Full article →</a>
+        </div>
       </div>
     </article>
 
     <article class="art-card" id="guide-instagram">
+      <div class="art-cat art-cat-ig">📷 Instagram</div>
       <h2 class="art-title" id="art-title-4">How to Download Instagram Videos and Reels</h2>
       <p class="art-summary" id="art-sum-4">Save Instagram Reels, videos and Stories to your phone or PC for free.</p>
       <div class="art-body" id="art-body-4"></div>
-      <div class="art-actions">
-        <button class="art-toggle" onclick="toggleArt(4)" id="art-tog-4">Read more ▼</button>
-        <a class="art-full" id="art-link-4" href="/download/article/en/how-to-download-instagram-video">Full article →</a>
+      <div class="art-footer">
+        <div class="art-langs">
+          <span class="art-lang-chip">🇬🇧 EN</span><span class="art-lang-chip">🇮🇳 HI</span><span class="art-lang-chip">🇨🇳 ZH</span><span class="art-lang-chip">🇸🇦 AR</span><span class="art-lang-chip">🇪🇸 ES</span><span class="art-lang-chip">🇩🇪 DE</span><span class="art-lang-chip">🇫🇷 FR</span>
+        </div>
+        <div class="art-actions">
+          <button class="art-toggle" onclick="toggleArt(4)" id="art-tog-4">Preview ▼</button>
+          <a class="art-full" id="art-link-4" href="/download/article/en/how-to-download-instagram-video">Full article →</a>
+        </div>
       </div>
     </article>
 
     <article class="art-card" id="guide-other">
+      <div class="art-cat art-cat-gen">🌐 1000+ sites</div>
       <h2 class="art-title" id="art-title-5">Download Videos from Any Website</h2>
       <p class="art-summary" id="art-sum-5">Download videos from 1000+ websites including Twitter, Facebook, Vimeo and more.</p>
       <div class="art-body" id="art-body-5"></div>
-      <div class="art-actions">
-        <button class="art-toggle" onclick="toggleArt(5)" id="art-tog-5">Read more ▼</button>
-        <a class="art-full" id="art-link-5" href="/download/article/en/download-videos-from-any-website">Full article →</a>
+      <div class="art-footer">
+        <div class="art-langs">
+          <span class="art-lang-chip">🇬🇧 EN</span><span class="art-lang-chip">🇮🇳 HI</span><span class="art-lang-chip">🇨🇳 ZH</span><span class="art-lang-chip">🇸🇦 AR</span><span class="art-lang-chip">🇪🇸 ES</span><span class="art-lang-chip">🇩🇪 DE</span><span class="art-lang-chip">🇫🇷 FR</span>
+        </div>
+        <div class="art-actions">
+          <button class="art-toggle" onclick="toggleArt(5)" id="art-tog-5">Preview ▼</button>
+          <a class="art-full" id="art-link-5" href="/download/article/en/download-videos-from-any-website">Full article →</a>
+        </div>
       </div>
     </article>
 
-    <article class="art-card art-card-pro" id="guide-professionals">
-      <div class="art-card-pro-badge">🎬 For Media Professionals</div>
-      <h2 class="art-title" id="art-title-6">Safe Video Downloader for Journalists &amp; Filmmakers</h2>
-      <p class="art-summary" id="art-sum-6">Why other downloader sites are dangerous — and how YT2GDrive protects journalists, documentary filmmakers and researchers.</p>
-      <div class="art-body" id="art-body-6"></div>
-      <div class="art-actions">
-        <button class="art-toggle" onclick="toggleArt(6)" id="art-tog-6">Read more ▼</button>
-        <a class="art-full" id="art-link-6" href="/download/article/en/safe-video-downloader-for-media-professionals">Full article →</a>
+    <article class="art-card art-card-pro art-card-wide" id="guide-professionals">
+      <div class="art-pro-icon">🎬</div>
+      <div class="art-wide-body">
+        <div class="art-cat art-cat-pro">Media Professionals</div>
+        <h2 class="art-title" id="art-title-6">Safe Video Downloader for Journalists &amp; Filmmakers</h2>
+        <p class="art-summary" id="art-sum-6">Why other downloader sites are dangerous — and how YT2GDrive protects journalists, documentary filmmakers and researchers.</p>
+        <div class="art-body" id="art-body-6"></div>
+        <div class="art-footer">
+          <div class="art-langs">
+            <span class="art-lang-chip">🇬🇧 EN</span><span class="art-lang-chip">🇮🇳 HI</span><span class="art-lang-chip">🇨🇳 ZH</span><span class="art-lang-chip">🇸🇦 AR</span><span class="art-lang-chip">🇪🇸 ES</span><span class="art-lang-chip">🇩🇪 DE</span><span class="art-lang-chip">🇫🇷 FR</span>
+          </div>
+          <div class="art-actions">
+            <button class="art-toggle" onclick="toggleArt(6)" id="art-tog-6">Preview ▼</button>
+            <a class="art-full" id="art-link-6" href="/download/article/en/safe-video-downloader-for-media-professionals">Full article →</a>
+          </div>
+        </div>
       </div>
     </article>
 
