@@ -208,18 +208,17 @@ header {
 .btn-main:active { transform: none; }
 .btn-main:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
 /* Snake Game */
-.game-wrap { display: flex; margin-top: 16px; background: var(--s2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; flex-direction: row; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; }
-.game-left { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
-.game-hdr { display: flex; justify-content: space-between; align-items: center; width: 100%; font-size: .8rem; }
+.game-wrap { display: flex; margin-top: 16px; background: var(--s2); border: 1px solid var(--border); border-radius: 12px; padding: 10px; flex-direction: column; align-items: stretch; gap: 8px; }
+.game-hdr { display: flex; justify-content: space-between; align-items: center; font-size: .8rem; }
 .game-hdr span:first-child { font-weight: 500; color: var(--text); }
 .game-score { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
-#gcanvas { border-radius: 8px; display: block; touch-action: none; }
-.dpad { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
-.dpad-mid { display: flex; align-items: center; gap: 4px; }
-.dpad-btn { width: 48px; height: 48px; background: var(--s1); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; touch-action: manipulation; user-select: none; -webkit-user-select: none; transition: background .08s, transform .08s; -webkit-tap-highlight-color: transparent; }
-.dpad-btn:active { background: var(--accent); border-color: var(--accent); transform: scale(0.9); }
-.dpad-center { width: 48px; height: 48px; }
-.game-tip { font-size: .68rem; color: var(--muted); text-align: center; width: 100%; }
+#gcanvas { border-radius: 8px; display: block; touch-action: none; width: 100%; height: auto; }
+.dpad { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; }
+.dpad-mid { display: contents; }
+.dpad-btn { flex: 1; max-width: 80px; height: 36px; background: var(--s1); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; touch-action: manipulation; user-select: none; -webkit-user-select: none; transition: background .08s, transform .08s; -webkit-tap-highlight-color: transparent; }
+.dpad-btn:active { background: var(--accent); border-color: var(--accent); transform: scale(0.95); }
+.dpad-center { display: none; }
+.game-tip { font-size: .68rem; color: var(--muted); text-align: center; }
 /* Steps */
 .steps-wrap { margin-top: 22px; display: none; }
 .overall-bar { height: 4px; background: var(--s2); border-radius: 100px; margin-bottom: 18px; overflow: hidden; }
@@ -489,15 +488,12 @@ header {
     </div>
     <canvas id="gcanvas"></canvas>
     <div class="dpad">
+      <button class="dpad-btn" id="gbtn-l" aria-label="Left">◀</button>
       <button class="dpad-btn" id="gbtn-u" aria-label="Up">▲</button>
-      <div class="dpad-mid">
-        <button class="dpad-btn" id="gbtn-l" aria-label="Left">◀</button>
-        <div class="dpad-center"></div>
-        <button class="dpad-btn" id="gbtn-r" aria-label="Right">▶</button>
-      </div>
       <button class="dpad-btn" id="gbtn-d" aria-label="Down">▼</button>
+      <button class="dpad-btn" id="gbtn-r" aria-label="Right">▶</button>
     </div>
-    <div class="game-tip">Arrow keys / WASD / swipe</div>
+    <div class="game-tip">Arrow keys · WASD · swipe on canvas</div>
   </div>
 </div>
 
@@ -1264,8 +1260,10 @@ function selectProv(p) { if (p !== 'google') return; provider = p; }
   }
 
   function initCanvas() {
+    const wrap = document.getElementById('game-wrap');
     const c = document.getElementById('gcanvas');
-    c.width = c.height = 200;
+    const sz = wrap.offsetWidth - 20;
+    c.width = c.height = sz > 100 ? sz : 280;
   }
 
   function spawnFood() {
