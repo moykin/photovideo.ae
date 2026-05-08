@@ -268,6 +268,8 @@ header {
 .art-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .art-full { font-size: .78rem; color: var(--accent); text-decoration: none; }
 .art-full:hover { text-decoration: underline; }
+.hdr-home { color: var(--muted); font-size: .8rem; text-decoration: none; white-space: nowrap; }
+.hdr-home:hover { color: var(--accent); }
 /* Modal */
 .overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 100;
@@ -310,6 +312,7 @@ header {
 <header>
   <div class="hdr-inner">
     <div class="logo"><div class="logo-icon">▶</div> <span>YT Downloader</span></div>
+    <a href="https://photovideo.ae" class="hdr-home">PhotoVideo.ae →</a>
     <div class="hdr-right">
       <div class="lang-wrap">
         <button class="lang-btn" onclick="toggleLangMenu()" id="langbtn">
