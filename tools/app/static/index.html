@@ -265,6 +265,12 @@ header {
   cursor: pointer; transition: all .15s;
 }
 .art-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.platform-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.pbadge { font-size: .72rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+.pbadge-yt  { background: rgba(255,0,0,.15); color: #ff4444; border: 1px solid rgba(255,0,0,.25); }
+.pbadge-ig  { background: rgba(225,48,108,.15); color: #e1306c; border: 1px solid rgba(225,48,108,.25); }
+.pbadge-tt  { background: rgba(105,201,208,.15); color: #69c9d0; border: 1px solid rgba(105,201,208,.25); }
+.pbadge-more { background: var(--s2); color: var(--muted); border: 1px solid var(--border); }
 .art-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .art-full { font-size: .78rem; color: var(--accent); text-decoration: none; }
 .art-full:hover { text-decoration: underline; }
@@ -339,12 +345,18 @@ header {
 </section>
 
 <div class="card" style="margin:0 16px">
-  <div class="input-label" id="lbl-url">YouTube Video URL</div>
+  <div class="platform-badges">
+    <span class="pbadge pbadge-yt">▶ YouTube</span>
+    <span class="pbadge pbadge-ig">📷 Instagram</span>
+    <span class="pbadge pbadge-tt">♪ TikTok</span>
+    <span class="pbadge pbadge-more">+1000 sites</span>
+  </div>
+  <div class="input-label" id="lbl-url">Video URL</div>
   <div class="url-wrap">
-    <input id="url" class="url-input" type="url" placeholder="https://youtube.com/watch?v=..." oninput="onUrl()" autocomplete="off">
+    <input id="url" class="url-input" type="url" placeholder="https://youtube.com/  instagram.com/  tiktok.com/..." oninput="onUrl()" autocomplete="off">
     <button class="url-clear" id="uclear" onclick="clearUrl()">✕</button>
   </div>
-  <div class="input-hint" id="input-hint">Paste any YouTube link — videos, Shorts, playlists</div>
+  <div class="input-hint" id="input-hint">Paste any link — YouTube, Instagram Reels, TikTok, and more</div>
 
   <div class="mode-tabs">
     <button class="tab active" id="tdl" onclick="setMode('download')">⬇ <span id="tab-dl-lbl">Download to Computer</span></button>
@@ -474,12 +486,12 @@ const LANGS = {
 // ── Translations ─────────────────────────────────────────────────────────────
 const T = {
 en: {
-  pageTitle: 'YouTube Video Downloader — Free HD Download & Save to Cloud',
-  metaDesc: 'Free YouTube video downloader. Download any video in HD to your computer or save directly to Google Drive. No software needed.',
-  heroTitle: 'Download Any YouTube Video — Free',
-  heroSub: 'Paste a YouTube link and save in HD quality to your computer or directly to Google Drive, OneDrive, or Dropbox.',
+  pageTitle: 'Video Downloader — YouTube, Instagram, TikTok | Free HD',
+  metaDesc: 'Free video downloader. Download from YouTube, Instagram, TikTok and 1000+ sites in HD to your computer or save directly to Google Drive. No software needed.',
+  heroTitle: 'Download Videos from YouTube, Instagram & TikTok — Free',
+  heroSub: 'Paste any link from YouTube, Instagram Reels, TikTok or 1000+ other sites and save in HD to your device or Google Drive.',
   f1:'✓ No registration required', f2:'✓ HD & 4K quality', f3:'✓ Save to cloud',
-  lblUrl:'YouTube Video URL', placeholder:'https://youtube.com/watch?v=...', inputHint:'Paste any YouTube link — videos, Shorts, playlists',
+  lblUrl:'Video URL', placeholder:'https://youtube.com/  instagram.com/  tiktok.com/...', inputHint:'Paste any link — YouTube, Instagram Reels, TikTok, and more',
   tabDl:'Download to Computer', tabCl:'Save to Cloud',
   modeHintDl:'Download as MP4 file directly to your device',
   modeHintCl:'Upload directly to Google Drive — no local storage needed',
@@ -511,12 +523,12 @@ en: {
   ]
 },
 hi: {
-  pageTitle: 'YouTube वीडियो डाउनलोडर — मुफ्त HD | Google Drive में सेव',
-  metaDesc: 'मुफ्त YouTube वीडियो डाउनलोडर। किसी भी YouTube वीडियो को HD में डाउनलोड करें या सीधे Google Drive में सेव करें।',
-  heroTitle: 'कोई भी YouTube वीडियो डाउनलोड करें — मुफ्त',
-  heroSub: 'YouTube लिंक पेस्ट करें और HD क्वालिटी में अपने कंप्यूटर पर डाउनलोड करें या सीधे Google Drive में सेव करें।',
+  pageTitle: 'वीडियो डाउनलोडर — YouTube, Instagram, TikTok | मुफ्त HD',
+  metaDesc: 'मुफ्त वीडियो डाउनलोडर। YouTube, Instagram, TikTok और 1000+ साइटों से HD में डाउनलोड करें या Google Drive में सेव करें।',
+  heroTitle: 'YouTube, Instagram और TikTok से वीडियो डाउनलोड करें — मुफ्त',
+  heroSub: 'YouTube, Instagram Reels, TikTok या 1000+ साइटों का कोई भी लिंक पेस्ट करें और HD में डाउनलोड करें।',
   f1:'✓ रजिस्ट्रेशन की जरूरत नहीं', f2:'✓ HD और 4K क्वालिटी', f3:'✓ क्लाउड में सेव',
-  lblUrl:'YouTube वीडियो URL', placeholder:'https://youtube.com/watch?v=...', inputHint:'कोई भी YouTube लिंक पेस्ट करें — वीडियो, Shorts, प्लेलिस्ट',
+  lblUrl:'वीडियो URL', placeholder:'https://youtube.com/  instagram.com/  tiktok.com/...', inputHint:'कोई भी लिंक पेस्ट करें — YouTube, Instagram Reels, TikTok और अधिक',
   tabDl:'कंप्यूटर पर डाउनलोड', tabCl:'क्लाउड में सेव',
   modeHintDl:'MP4 फाइल सीधे आपके डिवाइस में डाउनलोड करें',
   modeHintCl:'सीधे Google Drive में अपलोड करें — लोकल स्टोरेज की जरूरत नहीं',
@@ -548,12 +560,12 @@ hi: {
   ]
 },
 zh: {
-  pageTitle: 'YouTube视频下载器 — 免费高清下载 | 保存到Google Drive',
-  metaDesc: '免费YouTube视频下载器。将任意YouTube视频高清下载到电脑，或直接保存到Google Drive。无需安装软件。',
-  heroTitle: '免费下载任意YouTube视频',
-  heroSub: '粘贴YouTube链接，以高清质量下载到您的电脑，或直接保存到Google Drive、OneDrive或Dropbox。',
+  pageTitle: '视频下载器 — YouTube、Instagram、TikTok | 免费高清',
+  metaDesc: '免费视频下载器。从YouTube、Instagram、TikTok及1000+网站高清下载视频，或直接保存到Google Drive。无需软件。',
+  heroTitle: '免费下载YouTube、Instagram和TikTok视频',
+  heroSub: '粘贴YouTube、Instagram Reels、TikTok或1000+网站的任意链接，高清下载到设备或Google Drive。',
   f1:'✓ 无需注册', f2:'✓ 支持HD和4K画质', f3:'✓ 保存到云端',
-  lblUrl:'YouTube视频链接', placeholder:'https://youtube.com/watch?v=...', inputHint:'粘贴任意YouTube链接 — 视频、Shorts、播放列表',
+  lblUrl:'视频链接', placeholder:'https://youtube.com/  instagram.com/  tiktok.com/...', inputHint:'粘贴任意链接 — YouTube、Instagram Reels、TikTok等',
   tabDl:'下载到电脑', tabCl:'保存到云端',
   modeHintDl:'将MP4文件直接下载到您的设备',
   modeHintCl:'直接上传到Google Drive — 无需本地存储',
@@ -585,12 +597,12 @@ zh: {
   ]
 },
 ar: {
-  pageTitle: 'تحميل مقاطع يوتيوب — مجاني وبجودة HD | الحفظ على Google Drive',
-  metaDesc: 'تحميل مقاطع يوتيوب مجاناً بجودة HD إلى جهازك أو مباشرة إلى Google Drive. لا يلزم تثبيت برنامج.',
-  heroTitle: 'حمّل أي فيديو من يوتيوب — مجاناً',
-  heroSub: 'الصق رابط يوتيوب ونزّل الفيديو بجودة HD إلى جهازك، أو احفظه مباشرة في Google Drive أو OneDrive.',
+  pageTitle: 'تحميل مقاطع الفيديو — يوتيوب، إنستغرام، تيك توك | مجاني HD',
+  metaDesc: 'تحميل مجاني للفيديو. حمّل من يوتيوب وإنستغرام وتيك توك وأكثر من 1000 موقع بجودة HD أو احفظ في Google Drive.',
+  heroTitle: 'حمّل مقاطع من يوتيوب وإنستغرام وتيك توك — مجاناً',
+  heroSub: 'الصق أي رابط من يوتيوب أو Instagram Reels أو تيك توك أو أكثر من 1000 موقع ونزّل الفيديو بجودة HD.',
   f1:'✓ لا يلزم تسجيل', f2:'✓ جودة HD و4K', f3:'✓ الحفظ على السحابة',
-  lblUrl:'رابط فيديو يوتيوب', placeholder:'https://youtube.com/watch?v=...', inputHint:'الصق أي رابط يوتيوب — مقاطع، Shorts، قوائم التشغيل',
+  lblUrl:'رابط الفيديو', placeholder:'https://youtube.com/  instagram.com/  tiktok.com/...', inputHint:'الصق أي رابط — يوتيوب، Instagram Reels، تيك توك والمزيد',
   tabDl:'تحميل إلى الجهاز', tabCl:'حفظ على السحابة',
   modeHintDl:'تحميل ملف MP4 مباشرة إلى جهازك',
   modeHintCl:'رفع مباشر إلى Google Drive — دون استخدام مساحة محلية',
@@ -622,12 +634,12 @@ ar: {
   ]
 },
 es: {
-  pageTitle: 'Descargador de YouTube — Gratis HD | Guardar en Google Drive',
-  metaDesc: 'Descargador de vídeos YouTube gratuito. Descarga en HD a tu ordenador o guárdalo en Google Drive. Sin instalación.',
-  heroTitle: 'Descarga cualquier vídeo de YouTube — Gratis',
-  heroSub: 'Pega un enlace de YouTube y descárgalo en HD a tu dispositivo o guárdalo directamente en Google Drive, OneDrive o Dropbox.',
+  pageTitle: 'Descargador de vídeos — YouTube, Instagram, TikTok | Gratis HD',
+  metaDesc: 'Descargador de vídeos gratuito. Descarga de YouTube, Instagram, TikTok y más de 1000 sitios en HD o guarda en Google Drive.',
+  heroTitle: 'Descarga vídeos de YouTube, Instagram y TikTok — Gratis',
+  heroSub: 'Pega cualquier enlace de YouTube, Instagram Reels, TikTok o más de 1000 sitios y descarga en HD a tu dispositivo o Google Drive.',
   f1:'✓ Sin registro requerido', f2:'✓ Calidad HD y 4K', f3:'✓ Guardar en la nube',
-  lblUrl:'URL del vídeo de YouTube', placeholder:'https://youtube.com/watch?v=...', inputHint:'Pega cualquier enlace de YouTube — vídeos, Shorts, listas de reproducción',
+  lblUrl:'URL del vídeo', placeholder:'https://youtube.com/  instagram.com/  tiktok.com/...', inputHint:'Pega cualquier enlace — YouTube, Instagram Reels, TikTok y más',
   tabDl:'Descargar al Ordenador', tabCl:'Guardar en la Nube',
   modeHintDl:'Descarga el archivo MP4 directamente en tu dispositivo',
   modeHintCl:'Sube directamente a Google Drive — sin almacenamiento local',
@@ -659,12 +671,12 @@ es: {
   ]
 },
 de: {
-  pageTitle: 'YouTube Video Downloader — Kostenlos HD | In Google Drive speichern',
-  metaDesc: 'Kostenloser YouTube-Video-Downloader. Videos in HD auf deinen Computer laden oder direkt in Google Drive speichern. Keine Installation nötig.',
-  heroTitle: 'Beliebige YouTube-Videos kostenlos herunterladen',
-  heroSub: 'Füge einen YouTube-Link ein und lade das Video in HD auf deinen Computer oder speichere es direkt in Google Drive, OneDrive oder Dropbox.',
+  pageTitle: 'Video Downloader — YouTube, Instagram, TikTok | Kostenlos HD',
+  metaDesc: 'Kostenloser Video-Downloader. Videos von YouTube, Instagram, TikTok und 1000+ Seiten in HD herunterladen oder in Google Drive speichern.',
+  heroTitle: 'Videos von YouTube, Instagram und TikTok kostenlos herunterladen',
+  heroSub: 'Füge einen Link von YouTube, Instagram Reels, TikTok oder 1000+ anderen Seiten ein und lade das Video in HD herunter.',
   f1:'✓ Keine Registrierung nötig', f2:'✓ HD- und 4K-Qualität', f3:'✓ In der Cloud speichern',
-  lblUrl:'YouTube-Video-URL', placeholder:'https://youtube.com/watch?v=...', inputHint:'Beliebigen YouTube-Link einfügen — Videos, Shorts, Playlists',
+  lblUrl:'Video-URL', placeholder:'https://youtube.com/  instagram.com/  tiktok.com/...', inputHint:'Beliebigen Link einfügen — YouTube, Instagram Reels, TikTok und mehr',
   tabDl:'Auf Computer herunterladen', tabCl:'In der Cloud speichern',
   modeHintDl:'MP4-Datei direkt auf dein Gerät herunterladen',
   modeHintCl:'Direkt in Google Drive hochladen — kein lokaler Speicher nötig',
@@ -696,12 +708,12 @@ de: {
   ]
 },
 fr: {
-  pageTitle: 'Téléchargeur YouTube — Gratuit HD | Sauvegarder dans Google Drive',
-  metaDesc: 'Téléchargeur de vidéos YouTube gratuit. Téléchargez en HD sur votre ordinateur ou sauvegardez dans Google Drive. Sans installation.',
-  heroTitle: 'Téléchargez n\'importe quelle vidéo YouTube — Gratuitement',
-  heroSub: 'Collez un lien YouTube et téléchargez en HD sur votre appareil ou sauvegardez directement dans Google Drive, OneDrive ou Dropbox.',
+  pageTitle: 'Téléchargeur vidéo — YouTube, Instagram, TikTok | Gratuit HD',
+  metaDesc: 'Téléchargeur vidéo gratuit. Téléchargez depuis YouTube, Instagram, TikTok et plus de 1000 sites en HD ou sauvegardez dans Google Drive.',
+  heroTitle: 'Téléchargez des vidéos YouTube, Instagram et TikTok — Gratuitement',
+  heroSub: 'Collez n\'importe quel lien YouTube, Instagram Reels, TikTok ou 1000+ autres sites et téléchargez en HD.',
   f1:'✓ Aucune inscription requise', f2:'✓ Qualité HD et 4K', f3:'✓ Sauvegarder dans le cloud',
-  lblUrl:'URL de la vidéo YouTube', placeholder:'https://youtube.com/watch?v=...', inputHint:'Collez n\'importe quel lien YouTube — vidéos, Shorts, playlists',
+  lblUrl:'URL de la vidéo', placeholder:'https://youtube.com/  instagram.com/  tiktok.com/...', inputHint:'Collez n\'importe quel lien — YouTube, Instagram Reels, TikTok et plus',
   tabDl:'Télécharger sur l\'Ordinateur', tabCl:'Sauvegarder dans le Cloud',
   modeHintDl:'Télécharger le fichier MP4 directement sur votre appareil',
   modeHintCl:'Envoyer directement vers Google Drive — sans stockage local',
