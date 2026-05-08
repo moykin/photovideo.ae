@@ -479,6 +479,7 @@ ARTICLES: dict = {
 }
 
 LANG_NAMES = {'en':'English','hi':'हिन्दी','zh':'中文','ar':'العربية','es':'Español','de':'Deutsch','fr':'Français'}
+LANG_FLAGS = {'en':'🇬🇧','hi':'🇮🇳','zh':'🇨🇳','ar':'🇸🇦','es':'🇪🇸','de':'🇩🇪','fr':'🇫🇷'}
 LANG_DIRS  = {'en':'ltr','hi':'ltr','zh':'ltr','ar':'rtl','es':'ltr','de':'ltr','fr':'ltr'}
 
 BASE_URL = "https://photovideo.ae/download"
@@ -496,8 +497,8 @@ def _article_html(lang: str, article: dict) -> str:
         f'<a href="{BASE_URL}/article/{lang}/{ARTICLE_SLUGS[a["id"]]}" class="rel-link">{a["title"]}</a>'
         for a in other_articles
     )
-    lang_links = ' '.join(
-        f'<a href="{BASE_URL}/article/{l}/{slug}" class="lnk-l{"active" if l==lang else ""}">{LANG_NAMES[l]}</a>'
+    lang_links = ''.join(
+        f'<a href="{BASE_URL}/article/{l}/{slug}" class="lnk-l{"active" if l==lang else ""}"><span class="lnk-flag">{LANG_FLAGS[l]}</span>{LANG_NAMES[l]}</a>'
         for l in ARTICLES
     )
     dir_attr = LANG_DIRS.get(lang, 'ltr')
@@ -553,16 +554,23 @@ h1{{font-size:1.7rem;font-weight:700;margin-bottom:12px;line-height:1.3}}
 .art-body a{{color:var(--accent);text-decoration:none}}
 .art-body a:hover{{text-decoration:underline}}
 [dir="rtl"] .art-body ol,[dir="rtl"] .art-body ul{{margin:10px 20px 10px 0}}
-.langs{{display:flex;flex-wrap:wrap;gap:6px;margin:24px 0 0}}
-.lnk-l{{padding:4px 10px;border-radius:6px;font-size:.78rem;background:var(--s2);color:var(--muted);text-decoration:none;border:1px solid var(--border)}}
+.langs{{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 24px}}
+.lnk-l{{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-size:.82rem;background:var(--s2);color:var(--muted);text-decoration:none;border:1px solid var(--border);transition:all .15s}}
 .lnk-lactive{{background:var(--accent);color:#fff;border-color:var(--accent)}}
-.lnk-l:hover{{color:var(--text)}}
+.lnk-l:hover:not(.lnk-lactive){{background:var(--s1);color:var(--text);border-color:#3a4570}}
+.lnk-flag{{font-size:1rem;line-height:1}}
+.lang-label{{font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}}
 .related{{margin-top:36px;padding-top:24px;border-top:1px solid var(--border)}}
 .related h3{{font-size:.85rem;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em}}
 .rel-link{{display:block;color:var(--accent);text-decoration:none;font-size:.9rem;margin-bottom:8px}}
 .rel-link:hover{{text-decoration:underline}}
 .cta{{display:inline-block;margin-top:28px;padding:12px 24px;background:var(--accent);color:#fff;border-radius:var(--r);text-decoration:none;font-weight:600;font-size:.95rem}}
 .cta:hover{{opacity:.9}}
+#lang-banner{{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px;background:#1a2540;border-bottom:1px solid #2e4080;padding:10px 16px;font-size:.85rem;flex-wrap:wrap}}
+#lang-banner a{{color:#7eb3ff;font-weight:600;text-decoration:none;padding:4px 10px;background:rgba(79,142,247,.15);border-radius:6px;border:1px solid rgba(79,142,247,.3)}}
+#lang-banner a:hover{{background:rgba(79,142,247,.25)}}
+#lang-banner button{{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:2px 6px;border-radius:4px}}
+#lang-banner button:hover{{color:var(--text)}}
 </style>
 </head>
 <body>
@@ -575,14 +583,36 @@ h1{{font-size:1.7rem;font-weight:700;margin-bottom:12px;line-height:1.3}}
 <main>
   <h1>{article['title']}</h1>
   <p class="desc">{article['description']}</p>
+  <div class="lang-label">Read in your language</div>
+  <div class="langs">{lang_links}</div>
   <div class="art-body">{article['body']}</div>
   <a href="{BASE_URL}" class="cta">⬇ Try the Downloader</a>
   <div class="related">
     <h3>More Guides</h3>
     {related_html}
   </div>
-  <div class="langs">{lang_links}</div>
 </main>
+<script>
+(function(){{
+  var flags={{'en':'🇬🇧','hi':'🇮🇳','zh':'🇨🇳','ar':'🇸🇦','es':'🇪🇸','de':'🇩🇪','fr':'🇫🇷'}};
+  var names={{'en':'English','hi':'हिन्दी','zh':'中文','ar':'العربية','es':'Español','de':'Deutsch','fr':'Français'}};
+  var current=document.documentElement.lang||'en';
+  var slug=location.pathname.split('/').pop();
+  var nav=(navigator.language||navigator.userLanguage||'en').toLowerCase();
+  var detected='en';
+  var map=[['hi','hi'],['zh','zh'],['ar','ar'],['es','es'],['de','de'],['fr','fr']];
+  for(var i=0;i<map.length;i++){{if(nav.indexOf(map[i][0])===0){{detected=map[i][1];break;}}}}
+  var key='lx_'+slug+'_'+detected;
+  if(detected!==current&&!localStorage.getItem(key)){{
+    var b=document.createElement('div');
+    b.id='lang-banner';
+    b.innerHTML='<span>'+flags[detected]+' This article is available in '+names[detected]+'</span>'
+      +'<a href="{BASE_URL}/article/'+detected+'/'+slug+'">'+flags[detected]+' Read in '+names[detected]+'</a>'
+      +'<button onclick="localStorage.setItem(\''+key+'\',\'1\');document.getElementById(\'lang-banner\').remove()">✕</button>';
+    document.body.insertBefore(b,document.body.firstChild);
+  }}
+}})();
+</script>
 </body>
 </html>"""
 
@@ -634,8 +664,15 @@ async def index():
 
 
 @app.get("/article/{slug}")
-async def article_en(slug: str):
-    return await article_page(lang="en", slug=slug)
+async def article_en(slug: str, request: Request):
+    accept = request.headers.get("Accept-Language", "en").lower()
+    lang = "en"
+    for part in accept.replace(" ", "").split(","):
+        code = part.split(";")[0][:2]
+        if code in ARTICLES and code != "en":
+            lang = code
+            break
+    return RedirectResponse(url=f"{BASE_URL}/article/{lang}/{slug}", status_code=302)
 
 
 @app.get("/article/{lang}/{slug}")
