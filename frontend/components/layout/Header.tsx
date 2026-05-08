@@ -3,14 +3,15 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { Camera, Video, BookOpen, Newspaper, Menu, X, User, LogOut, Settings, LayoutDashboard, Download } from 'lucide-react';
+import { Video, BookOpen, Newspaper, Menu, X, User, LogOut, Settings, LayoutDashboard, Download } from 'lucide-react';
+import { Emblem } from '@/components/Emblem';
 import { cn } from '@/lib/utils';
 import { getStoredUser, signOut } from '@/lib/auth';
 import type { User as UserType } from '@/lib/types';
 import { getMediaUrl } from '@/lib/strapi';
 
 const navLinks = [
-  { href: '/photographers', label: 'Photographers', icon: Camera },
+  { href: '/photographers', label: 'Photographers', icon: Video },
   { href: '/videographers', label: 'Videographers', icon: Video },
   { href: '/feed', label: 'Feed', icon: BookOpen },
   { href: '/blog', label: 'Blog', icon: Newspaper },
@@ -43,8 +44,8 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-brand">
-              <Camera className="h-5 w-5 text-white" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-brand text-white">
+              <Emblem className="h-6 w-6" />
             </div>
             <span className="hidden sm:block font-display font-bold text-lg text-gray-900 dark:text-white">
               Photo<span className="gradient-text">Video</span>.ae

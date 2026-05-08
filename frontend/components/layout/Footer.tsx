@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Camera, Instagram, Facebook, Youtube } from 'lucide-react';
+import { Instagram, Facebook, Youtube } from 'lucide-react';
+import { Emblem } from '@/components/Emblem';
 
 const links = {
   Platform: [
@@ -28,8 +29,8 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-brand">
-                <Camera className="h-5 w-5 text-white" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-brand text-white">
+                <Emblem className="h-6 w-6" />
               </div>
               <span className="font-display font-bold text-lg text-white">
                 Photo<span className="text-brand-400">Video</span>.ae
