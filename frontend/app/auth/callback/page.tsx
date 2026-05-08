@@ -12,14 +12,14 @@
  * Настраивается в: Strapi Admin → Settings → Users & Permissions → Providers
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Camera, Loader2, AlertCircle } from 'lucide-react';
 import { setSession } from '@/lib/auth';
 import { getMe } from '@/lib/strapi';
 import { strapi } from '@/lib/strapi';
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState('');
@@ -78,5 +78,13 @@ export default function AuthCallbackPage() {
         <p className="text-sm text-gray-500 dark:text-gray-400">Signing you in...</p>
       </div>
     </div>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense>
+      <AuthCallbackContent />
+    </Suspense>
   );
 }
