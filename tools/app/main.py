@@ -1036,6 +1036,9 @@ async def _process(
             "-o", str(job_dir / "%(title)s.%(ext)s"),
             "--print", "after_move:filepath",
         ]
+        proxy = os.environ.get("YTDLP_PROXY", "").strip()
+        if proxy:
+            cmd += ["--proxy", proxy]
         for cookies_src in (Path("/cookies/youtube-cookies.txt"), Path("/app/cookies.txt")):
             if cookies_src.exists():
                 # copy to writable temp — yt-dlp tries to write back to the cookies file
