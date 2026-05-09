@@ -1036,9 +1036,13 @@ async def _process(
             "-o", str(job_dir / "%(title)s.%(ext)s"),
             "--print", "after_move:filepath",
         ]
-        for cookies_path in (Path("/cookies/youtube-cookies.txt"), Path("/app/cookies.txt")):
-            if cookies_path.exists():
-                cmd += ["--cookies", str(cookies_path)]
+        for cookies_src in (Path("/cookies/youtube-cookies.txt"), Path("/app/cookies.txt")):
+            if cookies_src.exists():
+                # copy to writable temp — yt-dlp tries to write back to the cookies file
+                import shutil
+                tmp_cookies = job_dir / "cookies.txt"
+                shutil.copy(cookies_src, tmp_cookies)
+                cmd += ["--cookies", str(tmp_cookies)]
                 break
         cmd.append(url)
 
