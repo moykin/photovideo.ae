@@ -1,0 +1,19 @@
+name: Sync YouTube Cookies to Server
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write cookies to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            mkdir -p /root/.config/yt-dlp
+            echo "${{ secrets.YOUTUBE_COOKIES_B64 }}" | base64 -d > /root/.config/yt-dlp/youtube-cookies.txt
+            echo "Cookies written: $(wc -l < /root/.config/yt-dlp/youtube-cookies.txt) lines"
