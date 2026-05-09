@@ -908,6 +908,10 @@ async def start(request: Request, background_tasks: BackgroundTasks):
     if not url:
         raise HTTPException(status_code=400, detail="URL is required")
 
+    client_ip = request.headers.get("CF-Connecting-IP") or request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or request.client.host
+    if not _check_rate_limit(client_ip):
+        raise HTTPException(status_code=429, detail=f"Too many requests. Max {RATE_LIMIT_MAX} downloads per hour.")
+
     data = _get_session(request)
     if action == "cloud" and provider == "google":
         if not data or not data.get("google_connected"):
@@ -965,6 +969,22 @@ async def get_history(request: Request):
     return JSONResponse({"items": enriched})
 
 
+
+
+# ── Rate limiting ────────────────────────────────────────────────────────────
+
+_rate_limit: dict[str, list[float]] = {}  # ip -> [timestamps]
+RATE_LIMIT_MAX = int(os.environ.get("RATE_LIMIT_MAX", "5"))
+RATE_LIMIT_WINDOW = int(os.environ.get("RATE_LIMIT_WINDOW", "3600"))  # seconds
+
+def _check_rate_limit(ip: str) -> bool:
+    now = time.time()
+    timestamps = [t for t in _rate_limit.get(ip, []) if now - t < RATE_LIMIT_WINDOW]
+    _rate_limit[ip] = timestamps
+    if len(timestamps) >= RATE_LIMIT_MAX:
+        return False
+    _rate_limit[ip].append(now)
+    return True
 
 
 # ── Proxy pool ───────────────────────────────────────────────────────────────
