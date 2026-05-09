@@ -1052,15 +1052,23 @@ async def _process(
         await progress_task
 
         if proc.returncode != 0:
-            stderr_text = " ".join(jobs[job_id].get("_stderr", []))
+            stderr_lines = jobs[job_id].get("_stderr", [])
+            stderr_text = " ".join(stderr_lines)
+            stderr_tail = " | ".join(l for l in stderr_lines[-5:] if l)
             if "rate-limited" in stderr_text or "ratelimit" in stderr_text.lower():
                 msg = "YouTube has rate-limited this server. Please try again in 30–60 minutes."
+            elif "Sign in to confirm" in stderr_text or "bot" in stderr_text.lower():
+                msg = "YouTube is blocking downloads from this server IP. Please try again in 1–2 hours."
             elif "Video unavailable" in stderr_text or "not available" in stderr_text.lower():
                 msg = "Video unavailable (private, deleted or geo-blocked)."
             elif "cookies" in stderr_text.lower() and "no longer valid" in stderr_text.lower():
                 msg = "Download error — YouTube session expired. Try again in a few minutes."
+            elif "HTTP Error 403" in stderr_text:
+                msg = "YouTube blocked the download (403). Please try again in a few minutes."
+            elif "HTTP Error 429" in stderr_text:
+                msg = "Too many requests — YouTube has rate-limited this server. Try again in 1 hour."
             else:
-                msg = "Download error. Check the URL."
+                msg = f"Download error: {stderr_tail}" if stderr_tail else "Download error. Check the URL."
             jobs[job_id].update({"status": "error", "message": msg})
             return
 
