@@ -1,6 +1,7 @@
 import asyncio
 import os
 import json
+import random
 import re
 import secrets
 import threading
@@ -966,6 +967,24 @@ async def get_history(request: Request):
 
 
 
+# ── Proxy pool ───────────────────────────────────────────────────────────────
+
+_proxy_blocked_until: dict[str, float] = {}  # proxy -> unblock timestamp
+
+def _get_proxy() -> str | None:
+    raw = os.environ.get("YTDLP_PROXIES", os.environ.get("YTDLP_PROXY", ""))
+    pool = [p.strip() for p in raw.split(",") if p.strip()]
+    if not pool:
+        return None
+    now = time.time()
+    available = [p for p in pool if _proxy_blocked_until.get(p, 0) < now]
+    return random.choice(available) if available else random.choice(pool)
+
+def _block_proxy(proxy: str, seconds: int = 3600):
+    if proxy:
+        _proxy_blocked_until[proxy] = time.time() + seconds
+
+
 # ── Background worker ─────────────────────────────────────────────────────────
 
 async def _read_progress(stream, job_id: str):
@@ -1036,12 +1055,11 @@ async def _process(
             "-o", str(job_dir / "%(title)s.%(ext)s"),
             "--print", "after_move:filepath",
         ]
-        proxy = os.environ.get("YTDLP_PROXY", "").strip()
+        proxy = _get_proxy()
         if proxy:
             cmd += ["--proxy", proxy]
         for cookies_src in (Path("/cookies/youtube-cookies.txt"), Path("/app/cookies.txt")):
             if cookies_src.exists():
-                # copy to writable temp — yt-dlp tries to write back to the cookies file
                 import shutil
                 tmp_cookies = job_dir / "cookies.txt"
                 shutil.copy(cookies_src, tmp_cookies)
@@ -1065,16 +1083,20 @@ async def _process(
             stderr_text = " ".join(stderr_lines)
             stderr_tail = " | ".join(l for l in stderr_lines[-5:] if l)
             if "rate-limited" in stderr_text or "ratelimit" in stderr_text.lower():
+                _block_proxy(proxy, 3600)
                 msg = "YouTube has rate-limited this server. Please try again in 30–60 minutes."
             elif "Sign in to confirm" in stderr_text or "bot" in stderr_text.lower():
+                _block_proxy(proxy, 3600)
                 msg = "YouTube is blocking downloads from this server IP. Please try again in 1–2 hours."
             elif "Video unavailable" in stderr_text or "not available" in stderr_text.lower():
                 msg = "Video unavailable (private, deleted or geo-blocked)."
             elif "cookies" in stderr_text.lower() and "no longer valid" in stderr_text.lower():
                 msg = "Download error — YouTube session expired. Try again in a few minutes."
             elif "HTTP Error 403" in stderr_text:
+                _block_proxy(proxy, 1800)
                 msg = "YouTube blocked the download (403). Please try again in a few minutes."
             elif "HTTP Error 429" in stderr_text:
+                _block_proxy(proxy, 3600)
                 msg = "Too many requests — YouTube has rate-limited this server. Try again in 1 hour."
             else:
                 msg = f"Download error: {stderr_tail}" if stderr_tail else "Download error. Check the URL."
