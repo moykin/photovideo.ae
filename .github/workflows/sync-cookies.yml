@@ -14,6 +14,6 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            mkdir -p /root/.config/yt-dlp
-            echo "${{ secrets.YOUTUBE_COOKIES_B64 }}" | base64 -d > /root/.config/yt-dlp/youtube-cookies.txt
-            echo "Cookies written: $(wc -l < /root/.config/yt-dlp/youtube-cookies.txt) lines"
+            sudo mkdir -p /root/.config/yt-dlp
+            echo "${{ secrets.YOUTUBE_COOKIES_B64 }}" | base64 -d | sudo tee /root/.config/yt-dlp/youtube-cookies.txt > /dev/null
+            echo "Cookies written: $(sudo wc -l /root/.config/yt-dlp/youtube-cookies.txt)"
