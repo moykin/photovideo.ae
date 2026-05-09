@@ -1029,8 +1029,10 @@ async def _process(
 
         cmd = [
             "yt-dlp", "--no-playlist",
+            "--extractor-args", "youtube:player_client=android,web",
             "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
             "--merge-output-format", "mp4",
+            "--add-header", "Accept-Language:en-US,en;q=0.9",
             "-o", str(job_dir / "%(title)s.%(ext)s"),
             "--print", "after_move:filepath",
         ]
