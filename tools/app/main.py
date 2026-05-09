@@ -969,8 +969,11 @@ async def get_history(request: Request):
 # ── Background worker ─────────────────────────────────────────────────────────
 
 async def _read_progress(stream, job_id: str):
+    stderr_lines: list[str] = []
     async for raw in stream:
         line = raw.decode(errors="replace").strip()
+        stderr_lines.append(line)
+        jobs[job_id].setdefault("_stderr", []).append(line)
 
         # [download]  45.2% of 245.32MiB at 3.20MiB/s ETA 01:10
         dl = re.search(
@@ -1049,7 +1052,16 @@ async def _process(
         await progress_task
 
         if proc.returncode != 0:
-            jobs[job_id].update({"status": "error", "message": "Download error. Check the URL."})
+            stderr_text = " ".join(jobs[job_id].get("_stderr", []))
+            if "rate-limited" in stderr_text or "ratelimit" in stderr_text.lower():
+                msg = "YouTube has rate-limited this server. Please try again in 30–60 minutes."
+            elif "Video unavailable" in stderr_text or "not available" in stderr_text.lower():
+                msg = "Video unavailable (private, deleted or geo-blocked)."
+            elif "cookies" in stderr_text.lower() and "no longer valid" in stderr_text.lower():
+                msg = "Download error — YouTube session expired. Try again in a few minutes."
+            else:
+                msg = "Download error. Check the URL."
+            jobs[job_id].update({"status": "error", "message": msg})
             return
 
         filepath = stdout_data.decode(errors="replace").strip().splitlines()[-1] if stdout_data.strip() else ""
