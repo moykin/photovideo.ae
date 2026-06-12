@@ -63,11 +63,24 @@ services:
     container_name: photovideo_yt2gdrive
     restart: unless-stopped
     env_file: ./tools/.env
+    environment:
+      - HTTP_PROXY=socks5://xray-client:1080
+      - HTTPS_PROXY=socks5://xray-client:1080
+      - ALL_PROXY=socks5://xray-client:1080
     ports:
       - '8080:8080'
     volumes:
       - ./tools/app:/app
       - ~/.config/yt-dlp:/cookies:ro
+
+  xray-client:
+    image: teddysun/xray:latest
+    container_name: photovideo_xray
+    restart: unless-stopped
+    volumes:
+      - ./infrastructure/xray/config.json:/etc/xray/config.json:ro
+    ports:
+      - '1080:1080'
 
 volumes:
   postgres_data:
