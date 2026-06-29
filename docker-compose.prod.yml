@@ -30,6 +30,8 @@ services:
       DATABASE_USERNAME: ${DB_USER:-strapi}
       DATABASE_PASSWORD: ${DB_PASSWORD}
       NODE_ENV: production
+      # поднимаем лимит кучи V8 — иначе сборка admin падает с FatalProcessOutOfMemory (2GB RAM + swap)
+      NODE_OPTIONS: "--max-old-space-size=2048"
     ports:
       - '127.0.0.1:1337:1337'
     volumes:
