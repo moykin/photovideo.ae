@@ -1,19 +1,21 @@
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display } from 'next/font/google';
+import { Plus_Jakarta_Sans, Cormorant_Garamond } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Providers } from '@/components/Providers';
 
-const inter = Inter({
-  subsets: ['latin', 'cyrillic'],
-  variable: '--font-inter',
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-jakarta',
   display: 'swap',
 });
 
-const playfair = Playfair_Display({
+const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
-  variable: '--font-playfair',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-cormorant',
   display: 'swap',
 });
 
@@ -58,7 +60,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${jakarta.variable} ${cormorant.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/svg+xml" href="/emblem.svg" />
@@ -77,7 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           "areaServed": { "@type": "Country", "name": "United Arab Emirates" },
         }) }} />
       </head>
-      <body className="min-h-screen flex flex-col">
+      <body className="min-h-screen flex flex-col bg-cream text-ink-500 antialiased">
         <Providers>
           <Header />
           <main className="flex-1">{children}</main>

@@ -52,30 +52,17 @@ function AppleIcon() {
 }
 
 const providers = [
-  {
-    id: 'google',
-    label: 'Google',
-    icon: GoogleIcon,
-    className: 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800',
-    textClass: 'text-gray-700 dark:text-gray-200',
-  },
-  {
-    id: 'facebook',
-    label: 'Facebook',
-    icon: FacebookIcon,
-    className: 'border-[#1877F2]/30 hover:bg-[#1877F2]/5',
-    textClass: 'text-[#1877F2]',
-  },
-  {
-    id: 'apple',
-    label: 'Apple',
-    icon: AppleIcon,
-    className: 'border-gray-900 dark:border-gray-100 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100',
-    textClass: 'text-white dark:text-gray-900',
-  },
+  { id: 'google', label: 'Google', icon: GoogleIcon },
+  { id: 'facebook', label: 'Facebook', icon: FacebookIcon },
+  { id: 'apple', label: 'Apple', icon: AppleIcon },
 ] as const;
 
-export function OAuthButtons({ mode = 'signin' }: Props) {
+interface OAuthButtonsProps extends Props {
+  /** When true, only the Google button is shown (primary, full-width). */
+  primaryOnly?: boolean;
+}
+
+export function OAuthButtons({ mode = 'signin', primaryOnly = false }: OAuthButtonsProps) {
   const verb = mode === 'signin' ? 'Continue' : 'Sign up';
 
   function handleOAuth(provider: string) {
@@ -83,17 +70,21 @@ export function OAuthButtons({ mode = 'signin' }: Props) {
     window.location.href = `${STRAPI_URL}/api/connect/${provider}`;
   }
 
+  const list = primaryOnly ? providers.filter((p) => p.id === 'google') : providers;
+
   return (
     <div className="space-y-3">
-      {providers.map(({ id, label, icon: Icon, className, textClass }) => (
+      {list.map(({ id, label, icon: Icon }) => (
         <button
           key={id}
           type="button"
           onClick={() => handleOAuth(id)}
-          className={`flex w-full items-center justify-center gap-3 rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors ${className}`}
+          className="flex w-full items-center justify-center gap-3 rounded-xl border border-sand-300 bg-cream-50 px-4 py-3 text-sm font-medium text-ink-600 shadow-soft transition-all hover:border-gold-400 hover:bg-cream-300 active:scale-[0.99]"
         >
           <Icon />
-          <span className={textClass}>{verb} with {label}</span>
+          <span>
+            {verb} with {label}
+          </span>
         </button>
       ))}
     </div>

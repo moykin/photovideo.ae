@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { getFeedPosts } from '@/lib/strapi';
-import { FeedPostCard } from '@/components/feed/FeedPostCard';
+import type { FeedPost } from '@/lib/types';
+import { SectionHeading } from '@/components/ui';
+import { FeedFilterTabs } from '@/components/feed/FeedFilterTabs';
+import { TrendingFeedCard } from '@/components/feed/TrendingFeedCard';
+import { FeedMasonryCard } from '@/components/feed/FeedMasonryCard';
 
 export const revalidate = 30;
 export const metadata: Metadata = {
@@ -8,78 +13,131 @@ export const metadata: Metadata = {
   description: 'Browse the latest work from top photographers and videographers across UAE.',
 };
 
-interface SearchParams { page?: string; category?: string; }
+interface SearchParams {
+  page?: string;
+  category?: string;
+}
+
+const CATEGORIES = [
+  { value: 'all', label: 'All' },
+  { value: 'work', label: 'Work' },
+  { value: 'behind_scenes', label: 'Behind the scenes' },
+  { value: 'tip', label: 'Tips' },
+  { value: 'announcement', label: 'News' },
+  { value: 'travel', label: 'Travel' },
+];
 
 export default async function FeedPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const params = await searchParams;
+  const currentPage = Number(params.page || 1);
+
   const filters: Record<string, unknown> = {
-    'pagination[page]': params.page || 1,
+    'pagination[page]': currentPage,
     'pagination[pageSize]': 18,
   };
   if (params.category) filters['filters[category]'] = params.category;
 
   const { data: posts, meta } = await getFeedPosts(filters).catch(() => ({
-    data: [],
+    data: [] as FeedPost[],
     meta: { pagination: { page: 1, pageSize: 18, pageCount: 0, total: 0 } },
   }));
 
-  const categories = ['all', 'work', 'behind_scenes', 'tip', 'announcement', 'travel'];
+  // На первой странице без фильтра выделяем верхние карточки с фото в блок «Trending».
+  const showTrending = currentPage === 1;
+  const trending = showTrending ? posts.filter((p) => p.media && p.media.length > 0).slice(0, 3) : [];
+  const trendingIds = new Set(trending.map((p) => p.id));
+  const rest = posts.filter((p) => !trendingIds.has(p.id));
 
   return (
-    <div className="py-10 px-4 sm:px-6">
-      <div className="container mx-auto max-w-7xl">
-        <div className="mb-8">
-          <h1 className="section-heading mb-1">Creative Feed</h1>
-          <p className="text-gray-500 dark:text-gray-400">
-            {meta.pagination.total} posts from UAE creators
+    <div className="min-h-screen bg-cream">
+      {/* Hero header */}
+      <section className="border-b border-sand-300 bg-cream-200">
+        <div className="container mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+          <span className="mb-2 inline-block text-xs font-semibold uppercase tracking-[0.18em] text-gold-500">
+            Creative Feed
+          </span>
+          <h1 className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+            Trending in Dubai
+          </h1>
+          <p className="mt-3 max-w-xl text-ink-500">
+            The latest work, stories and tips from {meta.pagination.total} creators across the UAE.
           </p>
         </div>
+      </section>
 
-        {/* Category filter */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          {categories.map((cat) => (
-            <a
-              key={cat}
-              href={cat === 'all' ? '/feed' : `/feed?category=${cat}`}
-              className={`badge px-4 py-2 capitalize transition-colors ${
-                (params.category || 'all') === cat
-                  ? 'bg-brand-500 text-white'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-brand-50 dark:hover:bg-brand-900/20 hover:text-brand-600'
-              }`}
-            >
-              {cat.replace('_', ' ')}
-            </a>
-          ))}
+      <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">
+        {/* Filter tabs */}
+        <div className="mb-8">
+          <FeedFilterTabs categories={CATEGORIES} />
         </div>
 
         {posts.length === 0 ? (
-          <div className="text-center py-24 text-gray-400">No posts yet. Be the first to share!</div>
-        ) : (
-          <div className="masonry">
-            {posts.map((post) => (
-              <div key={post.id} className="break-inside-avoid mb-4">
-                <FeedPostCard post={post} />
-              </div>
-            ))}
+          <div className="rounded-3xl border border-sand-300 bg-cream-50 py-24 text-center">
+            <p className="font-display text-2xl text-ink">No posts yet</p>
+            <p className="mt-2 text-ink-400">Be the first to share your work.</p>
           </div>
+        ) : (
+          <>
+            {/* Trending row */}
+            {trending.length > 0 && (
+              <section className="mb-12">
+                <SectionHeading
+                  eyebrow="Featured"
+                  title="Trending now"
+                  className="mb-6"
+                  action={
+                    <Link
+                      href="/photographers"
+                      className="text-sm font-semibold text-gold-600 hover:text-gold-700"
+                    >
+                      Find a pro →
+                    </Link>
+                  }
+                />
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {trending.map((post, i) => (
+                    <TrendingFeedCard key={post.id} post={post} priority={i < 3} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Masonry feed */}
+            {rest.length > 0 && (
+              <section>
+                {trending.length > 0 && (
+                  <SectionHeading title="From the community" className="mb-6" />
+                )}
+                <div className="masonry">
+                  {rest.map((post) => (
+                    <FeedMasonryCard key={post.id} post={post} />
+                  ))}
+                </div>
+              </section>
+            )}
+          </>
         )}
 
         {/* Pagination */}
         {meta.pagination.pageCount > 1 && (
-          <div className="mt-12 flex justify-center gap-2">
-            {Array.from({ length: meta.pagination.pageCount }, (_, i) => i + 1).map((p) => (
-              <a
-                key={p}
-                href={`?page=${p}${params.category ? `&category=${params.category}` : ''}`}
-                className={`h-9 w-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
-                  Number(params.page || 1) === p
-                    ? 'bg-brand-500 text-white'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 hover:bg-brand-50 hover:text-brand-600'
-                }`}
-              >
-                {p}
-              </a>
-            ))}
+          <div className="mt-12 flex flex-wrap justify-center gap-2">
+            {Array.from({ length: meta.pagination.pageCount }, (_, i) => i + 1).map((p) => {
+              const isActive = currentPage === p;
+              const href = `?page=${p}${params.category ? `&category=${params.category}` : ''}`;
+              return (
+                <Link
+                  key={p}
+                  href={href}
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl text-sm font-semibold transition-colors ${
+                    isActive
+                      ? 'bg-gold-500 text-cream-50 shadow-soft'
+                      : 'border border-sand-300 bg-cream-50 text-ink-500 hover:border-gold-300 hover:text-gold-600'
+                  }`}
+                >
+                  {p}
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>

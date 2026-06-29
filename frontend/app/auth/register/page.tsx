@@ -9,6 +9,8 @@ import { z } from 'zod';
 import { Camera, Video, User, Loader2 } from 'lucide-react';
 import { signUp } from '@/lib/auth';
 import { OAuthButtons } from '@/components/auth/OAuthButtons';
+import { AuthLayout } from '@/components/auth/AuthLayout';
+import { AuthField, AuthDivider } from '@/components/auth/AuthField';
 
 const schema = z.object({
   displayName: z.string().min(2, 'Minimum 2 characters'),
@@ -52,117 +54,127 @@ function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gray-50 dark:bg-gray-950">
-      <div className="w-full max-w-lg">
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-brand">
-              <Camera className="h-6 w-6 text-white" />
-            </div>
-            <span className="font-display font-bold text-xl text-gray-900 dark:text-white">
-              Photo<span className="gradient-text">Video</span>.ae
-            </span>
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create your account</h1>
-          <p className="text-gray-500 mt-1">Join the UAE&apos;s creative community</p>
-        </div>
-
-        <div className="card p-8">
-          {/* OAuth кнопки */}
-          <OAuthButtons mode="signup" />
-
-          {/* Разделитель */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200 dark:border-gray-700" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-white dark:bg-gray-900 px-3 text-xs text-gray-400">or sign up with email</span>
-            </div>
-          </div>
-
-          {error && (
-            <div className="mb-5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 text-sm text-red-600 dark:text-red-400">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* Account type */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                I am a...
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                {typeOptions.map(({ value, label, icon: Icon, desc }) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setValue('userType', value)}
-                    className={`p-3 rounded-xl border text-left transition-all ${
-                      userType === value
-                        ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-brand-300'
-                    }`}
-                  >
-                    <Icon className={`h-5 w-5 mb-1 ${userType === value ? 'text-brand-500' : 'text-gray-400'}`} />
-                    <p className={`text-sm font-medium ${userType === value ? 'text-brand-600 dark:text-brand-300' : 'text-gray-700 dark:text-gray-300'}`}>
-                      {label}
-                    </p>
-                    <p className="text-xs text-gray-400">{desc}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Full Name</label>
-              <input {...register('displayName')} placeholder="John Smith" className="input" />
-              {errors.displayName && <p className="text-xs text-red-500 mt-1">{errors.displayName.message}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Username</label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">@</span>
-                <input {...register('username')} placeholder="johnsmith" className="input pl-8" />
-              </div>
-              {errors.username && <p className="text-xs text-red-500 mt-1">{errors.username.message}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email</label>
-              <input {...register('email')} type="email" placeholder="you@example.com" className="input" autoComplete="email" />
-              {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Password</label>
-              <input {...register('password')} type="password" placeholder="Min 8 characters" className="input" autoComplete="new-password" />
-              {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>}
-            </div>
-
-            <button type="submit" disabled={isSubmitting} className="btn-primary w-full">
-              {isSubmitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Creating account...</> : 'Create Account'}
-            </button>
-
-            <p className="text-xs text-center text-gray-400">
-              By registering you agree to our{' '}
-              <Link href="/terms" className="text-brand-500 hover:underline">Terms</Link>
-              {' '}and{' '}
-              <Link href="/privacy" className="text-brand-500 hover:underline">Privacy Policy</Link>.
-            </p>
-          </form>
-
-          <p className="mt-6 text-center text-sm text-gray-500">
-            Already have an account?{' '}
-            <Link href="/auth/login" className="text-brand-500 hover:text-brand-600 font-medium">
-              Sign in
-            </Link>
-          </p>
-        </div>
+    <AuthLayout
+      eyebrow="Become a pro"
+      headline="Turn your work into bookings."
+      subline="Build a stunning portfolio and get discovered by clients across the UAE."
+      image="https://photovideo-ae-media.s3.ap-south-1.amazonaws.com/auth_hero_signup.jpg"
+      quote={{
+        text: 'I went from side gigs to a fully booked calendar in my first season.',
+        author: 'Omar K. — Videographer, Abu Dhabi',
+      }}
+    >
+      <div className="mb-8">
+        <h1 className="font-display text-3xl font-medium text-ink">Create your account</h1>
+        <p className="mt-1 text-sm text-ink-500">Join the UAE&apos;s creative community</p>
       </div>
-    </div>
+
+      <OAuthButtons mode="signup" />
+
+      <AuthDivider label="or sign up with email" />
+
+      {error && (
+        <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        {/* Account type */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-ink-600">I am a...</label>
+          <div className="grid grid-cols-2 gap-2.5">
+            {typeOptions.map(({ value, label, icon: Icon, desc }) => {
+              const active = userType === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setValue('userType', value)}
+                  className={`rounded-2xl border p-3 text-left transition-all ${
+                    active
+                      ? 'border-gold-400 bg-gold-50 shadow-soft'
+                      : 'border-sand-300 bg-cream-50 hover:border-gold-300'
+                  }`}
+                >
+                  <Icon className={`mb-1 h-5 w-5 ${active ? 'text-gold-600' : 'text-ink-300'}`} />
+                  <p className={`text-sm font-semibold ${active ? 'text-gold-700' : 'text-ink-600'}`}>
+                    {label}
+                  </p>
+                  <p className="text-xs text-ink-300">{desc}</p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <AuthField
+          label="Full Name"
+          placeholder="John Smith"
+          error={errors.displayName?.message}
+          {...register('displayName')}
+        />
+
+        <AuthField
+          label="Username"
+          placeholder="johnsmith"
+          leftAdornment="@"
+          error={errors.username?.message}
+          {...register('username')}
+        />
+
+        <AuthField
+          label="Email"
+          type="email"
+          placeholder="you@example.com"
+          autoComplete="email"
+          error={errors.email?.message}
+          {...register('email')}
+        />
+
+        <AuthField
+          label="Password"
+          type="password"
+          placeholder="Min 8 characters"
+          autoComplete="new-password"
+          error={errors.password?.message}
+          {...register('password')}
+        />
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="flex w-full items-center justify-center gap-2 rounded-pill bg-gold-500 px-6 py-3.5 text-sm font-semibold text-cream shadow-gold transition-all hover:bg-gold-600 active:scale-[0.99] disabled:opacity-50"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> Creating account...
+            </>
+          ) : (
+            'Create Account'
+          )}
+        </button>
+
+        <p className="text-center text-xs text-ink-300">
+          By registering you agree to our{' '}
+          <Link href="/terms" className="text-gold-600 hover:underline">
+            Terms
+          </Link>{' '}
+          and{' '}
+          <Link href="/privacy" className="text-gold-600 hover:underline">
+            Privacy Policy
+          </Link>
+          .
+        </p>
+      </form>
+
+      <p className="mt-6 text-center text-sm text-ink-500">
+        Already have an account?{' '}
+        <Link href="/auth/login" className="font-semibold text-gold-600 hover:text-gold-700">
+          Sign in
+        </Link>
+      </p>
+    </AuthLayout>
   );
 }
 

@@ -22,20 +22,20 @@ export function ArticleCard({ article }: Props) {
             sizes="(max-width: 768px) 100vw, 33vw"
           />
           <div className="absolute top-3 left-3">
-            <span className="badge bg-brand-500 text-white capitalize">{article.category}</span>
+            <span className="badge bg-gold-500 text-cream capitalize">{article.category}</span>
           </div>
         </div>
       )}
       <div className="p-5">
-        <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 mb-2 group-hover:text-brand-500 transition-colors">
+        <h3 className="font-display text-xl font-semibold text-ink line-clamp-2 mb-2 group-hover:text-gold-600 transition-colors">
           {article.title}
         </h3>
         {article.excerpt && (
-          <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-4">
+          <p className="text-sm text-ink-500 line-clamp-2 mb-4">
             {article.excerpt}
           </p>
         )}
-        <div className="flex items-center justify-between text-xs text-gray-400">
+        <div className="flex items-center justify-between text-xs text-ink-300">
           <div className="flex items-center gap-2">
             {article.author?.avatar ? (
               <Image
@@ -46,7 +46,7 @@ export function ArticleCard({ article }: Props) {
                 className="rounded-full"
               />
             ) : (
-              <div className="h-5 w-5 rounded-full bg-gradient-brand flex items-center justify-center text-white text-[9px] font-bold">
+              <div className="h-5 w-5 rounded-full bg-gradient-brand flex items-center justify-center text-cream text-[9px] font-bold">
                 {getInitials(article.author?.displayName || article.author?.username)}
               </div>
             )}

@@ -9,31 +9,79 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        brand: {
-          50:  '#fdf4ff',
-          100: '#fae8ff',
-          200: '#f3d0fe',
-          300: '#e9a8fc',
-          400: '#d873f8',
-          500: '#c044f0',
-          600: '#a521d1',
-          700: '#8b1cac',
-          800: '#721c8a',
-          900: '#5e1c6e',
-          950: '#3d0748',
+        // Warm cream page / section backgrounds
+        cream: {
+          DEFAULT: '#fbf8f2',
+          50: '#fdfcf8',
+          100: '#fbf8f2',
+          200: '#f7f3eb',
+          300: '#f4ecda',
+          400: '#efe6d2',
+          500: '#e7e0d2',
         },
+        // Sand — warm neutral borders & muted surfaces
+        sand: {
+          100: '#f4ecda',
+          200: '#efe6d2',
+          300: '#e7e0d2',
+          400: '#e0d7c5',
+          500: '#c9c0ae',
+          600: '#a79e8c',
+          700: '#8b8273',
+        },
+        // Gold / bronze accent
         gold: {
-          400: '#f5c842',
-          500: '#e8b800',
+          DEFAULT: '#b68a3e',
+          50: '#faf4e6',
+          100: '#f3e6c8',
+          200: '#e4d5b3',
+          300: '#d8b978',
+          400: '#c79a4f',
+          500: '#b68a3e',
+          600: '#8a6326',
+          700: '#5a4a2a',
+        },
+        // Ink — headings / dark surfaces / text
+        ink: {
+          DEFAULT: '#221c15',
+          900: '#1c1710',
+          800: '#221c15',
+          700: '#3a332a',
+          600: '#5c5446',
+          500: '#6e6557',
+          400: '#8b8273',
+          300: '#9a917f',
+        },
+        // Keep 'brand' as an alias for gold so legacy classes keep working
+        brand: {
+          50: '#faf4e6',
+          100: '#f3e6c8',
+          200: '#e4d5b3',
+          300: '#d8b978',
+          400: '#c79a4f',
+          500: '#b68a3e',
+          600: '#8a6326',
+          700: '#5a4a2a',
+          800: '#48381f',
+          900: '#332817',
+          950: '#221c15',
         },
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-playfair)', 'Georgia', 'serif'],
+        sans: ['var(--font-jakarta)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-cormorant)', 'Georgia', 'serif'],
       },
       backgroundImage: {
-        'gradient-brand': 'linear-gradient(135deg, #c044f0 0%, #7c3aed 50%, #2563eb 100%)',
-        'gradient-dark': 'linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 100%)',
+        'gradient-brand': 'linear-gradient(135deg, #d8b978 0%, #b68a3e 55%, #8a6326 100%)',
+        'gradient-dark': 'linear-gradient(180deg, #221c15 0%, #1c1710 100%)',
+      },
+      boxShadow: {
+        soft: '0 12px 30px -16px rgba(60,42,12,.3)',
+        card: '0 16px 40px -22px rgba(60,42,12,.4)',
+        gold: '0 12px 24px -8px rgba(160,110,30,.55)',
+      },
+      borderRadius: {
+        pill: '999px',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',

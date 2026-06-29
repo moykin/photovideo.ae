@@ -52,7 +52,7 @@ export function FeedMasonryCard({ post }: Props) {
   }
 
   return (
-    <div className="break-inside-avoid mb-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-md transition-shadow duration-200">
+    <div className="break-inside-avoid mb-4 rounded-2xl bg-cream-50 border border-sand-300 overflow-hidden hover:shadow-card transition-shadow duration-200">
 
       {/* Фото (если есть) */}
       {hasMedia && (
@@ -67,7 +67,7 @@ export function FeedMasonryCard({ post }: Props) {
           />
           {/* Счётчик если несколько фото */}
           {post.media.length > 1 && (
-            <div className="absolute top-2 right-2 flex items-center gap-1 rounded-full bg-black/60 backdrop-blur-sm px-2 py-0.5 text-white text-xs">
+            <div className="absolute top-2 right-2 flex items-center gap-1 rounded-pill bg-ink/60 backdrop-blur-sm px-2 py-0.5 text-cream text-xs">
               +{post.media.length - 1}
             </div>
           )}
@@ -90,21 +90,21 @@ export function FeedMasonryCard({ post }: Props) {
               className="rounded-full object-cover flex-shrink-0"
             />
           ) : (
-            <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-brand-500 text-xs font-bold">
+            <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gold-100 text-gold-600 text-xs font-bold">
               {authorName[0].toUpperCase()}
             </div>
           )}
-          <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 group-hover:text-brand-500 transition-colors truncate">
+          <span className="text-xs font-semibold text-ink-600 group-hover:text-gold-600 transition-colors truncate">
             {authorName}
           </span>
-          <span className="ml-auto text-xs text-gray-400 flex-shrink-0">
+          <span className="ml-auto text-xs text-ink-300 flex-shrink-0">
             {timeAgo(post.createdAt)}
           </span>
         </Link>
 
         {/* Текст (если есть) */}
         {hasCaption && (
-          <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-2">
+          <p className="text-sm text-ink-500 leading-relaxed mb-2">
             {hasMedia
               ? truncate(post.caption!, 120)   // под фото — короче
               : truncate(post.caption!, 280)}  {/* только текст — длиннее */}
@@ -113,7 +113,7 @@ export function FeedMasonryCard({ post }: Props) {
 
         {/* Локация */}
         {post.location && (
-          <div className="flex items-center gap-1 text-xs text-gray-400 mb-2">
+          <div className="flex items-center gap-1 text-xs text-ink-300 mb-2">
             <MapPin className="h-3 w-3" />
             <span>{post.location}</span>
           </div>
@@ -123,7 +123,7 @@ export function FeedMasonryCard({ post }: Props) {
         {post.tags && post.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-2">
             {post.tags.slice(0, 4).map((tag) => (
-              <span key={tag} className="text-xs text-brand-500 hover:text-brand-600 cursor-pointer">
+              <span key={tag} className="text-xs text-gold-500 hover:text-gold-600 cursor-pointer">
                 #{tag}
               </span>
             ))}
@@ -131,11 +131,11 @@ export function FeedMasonryCard({ post }: Props) {
         )}
 
         {/* Footer: лайки + комментарии */}
-        <div className="flex items-center gap-3 pt-1 border-t border-gray-100 dark:border-gray-800">
+        <div className="flex items-center gap-3 pt-1 border-t border-sand-300">
           <button
             onClick={handleLike}
             disabled={liking}
-            className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-500 transition-colors"
+            className="flex items-center gap-1 text-xs text-ink-400 hover:text-red-500 transition-colors"
           >
             <Heart
               className={`h-4 w-4 transition-colors ${liked ? 'fill-red-500 text-red-500' : ''}`}
@@ -146,7 +146,7 @@ export function FeedMasonryCard({ post }: Props) {
           {post.commentsCount > 0 && (
             <Link
               href={`/feed/${post.id}`}
-              className="flex items-center gap-1 text-xs text-gray-500 hover:text-brand-500 transition-colors"
+              className="flex items-center gap-1 text-xs text-ink-400 hover:text-gold-500 transition-colors"
             >
               <MessageCircle className="h-4 w-4" />
               <span>{post.commentsCount}</span>

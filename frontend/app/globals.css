@@ -4,17 +4,12 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-  }
-
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
+    --background: 40 50% 96%;     /* cream #fbf8f2 */
+    --foreground: 36 22% 11%;     /* ink #221c15 */
   }
 
   * {
-    @apply border-gray-200 dark:border-gray-800;
+    @apply border-sand-300;
   }
 
   html {
@@ -22,12 +17,20 @@
   }
 
   body {
-    @apply bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased;
+    @apply bg-cream text-ink-500 antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  h1, h2, h3, h4 {
+    @apply font-display text-ink tracking-tight;
+  }
+
+  a {
+    @apply transition-colors;
+  }
+
   ::selection {
-    @apply bg-brand-500 text-white;
+    @apply bg-gold-300/60 text-ink;
   }
 
   ::-webkit-scrollbar {
@@ -39,58 +42,62 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-gray-300 dark:bg-gray-700;
+    @apply rounded-full bg-sand-400;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 py-3
-           text-sm font-semibold text-white shadow-lg shadow-brand-500/30
-           transition-all duration-200 hover:bg-brand-600 hover:shadow-brand-600/40
+    @apply inline-flex items-center justify-center gap-2 rounded-pill bg-gold-500 px-6 py-3
+           text-sm font-semibold text-cream shadow-gold
+           transition-all duration-200 hover:bg-gold-600
            active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200
-           dark:border-gray-700 bg-white dark:bg-gray-900 px-6 py-3 text-sm font-semibold
-           text-gray-700 dark:text-gray-200 transition-all duration-200
-           hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-95
+    @apply inline-flex items-center justify-center gap-2 rounded-pill border border-sand-300
+           bg-cream-50 px-6 py-3 text-sm font-semibold text-ink
+           transition-all duration-200 hover:bg-cream-300 active:scale-95
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm
-           font-medium text-gray-600 dark:text-gray-400 transition-all duration-200
-           hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 rounded-pill px-4 py-2 text-sm
+           font-medium text-ink-500 transition-all duration-200
+           hover:bg-cream-300 hover:text-ink active:scale-95;
   }
 
   .card {
-    @apply rounded-2xl bg-white dark:bg-gray-900 shadow-sm border border-gray-100
-           dark:border-gray-800 overflow-hidden transition-all duration-200;
+    @apply rounded-2xl bg-cream-50 shadow-soft border border-sand-300
+           overflow-hidden transition-all duration-200;
   }
 
   .card-hover {
-    @apply card hover:shadow-lg hover:-translate-y-0.5 cursor-pointer;
+    @apply card hover:shadow-card hover:-translate-y-0.5 cursor-pointer;
   }
 
   .input {
-    @apply w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white
-           dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100
-           placeholder-gray-400 dark:placeholder-gray-500 outline-none
-           transition-all duration-200 focus:ring-2 focus:ring-brand-500 focus:border-transparent;
+    @apply w-full rounded-xl border border-sand-300 bg-cream-50 px-4 py-3 text-sm
+           text-ink placeholder-ink-300 outline-none
+           transition-all duration-200 focus:ring-2 focus:ring-gold-300 focus:border-transparent;
   }
 
   .badge {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+    @apply inline-flex items-center rounded-pill px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-pill border border-sand-300 bg-cream-50
+           px-3.5 py-1.5 text-xs font-medium text-ink-500 transition-colors
+           hover:border-gold-300 hover:text-ink;
   }
 
   .section-heading {
-    @apply text-3xl font-display font-bold text-gray-900 dark:text-white tracking-tight;
+    @apply text-3xl sm:text-4xl font-display font-semibold text-ink tracking-tight;
   }
 
   .gradient-text {
-    @apply bg-gradient-brand bg-clip-text text-transparent;
+    @apply text-gold-500;
   }
 }
 
