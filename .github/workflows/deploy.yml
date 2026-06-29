@@ -15,7 +15,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/${{ secrets.EC2_USER }}/photovideo.ae
+            cd ~/photovideo.ae
             git pull origin main
             docker compose -f docker-compose.prod.yml up --build -d
             docker image prune -f
