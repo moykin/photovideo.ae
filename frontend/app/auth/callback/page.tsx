@@ -14,7 +14,8 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Camera, Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 import { setSession } from '@/lib/auth';
 import { getMe } from '@/lib/strapi';
 import { strapi } from '@/lib/strapi';
@@ -71,9 +72,7 @@ function AuthCallbackContent() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
       <div className="text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-brand mx-auto mb-4">
-          <Camera className="h-7 w-7 text-white" />
-        </div>
+        <Logo href={null} className="mb-5" />
         <Loader2 className="h-6 w-6 animate-spin text-brand-500 mx-auto mb-3" />
         <p className="text-sm text-gray-500 dark:text-gray-400">Signing you in...</p>
       </div>

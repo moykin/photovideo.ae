@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { ReactNode } from 'react';
-import { Camera, Quote } from 'lucide-react';
+import { Quote } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 
 interface Props {
   /** Form column content (already includes heading + form). */
@@ -38,15 +38,7 @@ export function AuthLayout({
       {/* Form column */}
       <div className="flex min-h-screen flex-col px-5 py-8 sm:px-10 lg:px-16 lg:py-12">
         {/* Logo */}
-        <Link href="/" className="inline-flex items-center gap-2 self-start">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-brand text-cream">
-            <Camera className="h-5 w-5" />
-          </div>
-          <span className="font-display text-xl font-semibold text-ink">
-            Photo<span className="text-gold-500">Video</span>
-            <span className="text-ink-300">.ae</span>
-          </span>
-        </Link>
+        <Logo className="self-start" />
 
         {/* Centered form */}
         <div className="flex flex-1 items-center justify-center py-10">

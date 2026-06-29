@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans, Cormorant_Garamond } from 'next/font/google';
 import './globals.css';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { SiteChrome } from '@/components/layout/SiteChrome';
 import { Providers } from '@/components/Providers';
 
 const jakarta = Plus_Jakarta_Sans({
@@ -81,9 +80,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen flex flex-col bg-cream text-ink-500 antialiased">
         <Providers>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <SiteChrome>{children}</SiteChrome>
         </Providers>
       </body>
     </html>

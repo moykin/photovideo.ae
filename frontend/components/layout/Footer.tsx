@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Instagram, Facebook, Youtube } from 'lucide-react';
-import { Emblem } from '@/components/Emblem';
+import { Logo } from '@/components/Logo';
 
 const links = {
   Discover: [
@@ -28,14 +28,7 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-brand text-cream">
-                <Emblem className="h-6 w-6" />
-              </div>
-              <span className="font-display font-semibold text-xl text-cream">
-                Photo<span className="text-gold-300">Video</span>.ae
-              </span>
-            </Link>
+            <Logo tone="light" className="mb-4" />
             <p className="text-sm leading-relaxed mb-6 text-ink-300">
               The UAE&apos;s home for discovering and booking talented photographers and videographers.
             </p>

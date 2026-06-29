@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, User, Images, Calendar, BookOpen,
-  Settings, LogOut, ChevronRight, Camera,
+  Settings, LogOut, ChevronRight,
 } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 import { getStoredUser, signOut } from '@/lib/auth';
 import { cn, getInitials } from '@/lib/utils';
 import type { User as UserType } from '@/lib/types';
@@ -42,13 +43,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Sidebar */}
       <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-        <div className="flex h-16 items-center gap-2 px-5 border-b border-gray-200 dark:border-gray-800">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-brand">
-            <Camera className="h-4 w-4 text-white" />
-          </div>
-          <span className="font-display font-bold text-gray-900 dark:text-white">
-            Photo<span className="gradient-text">Video</span>.ae
-          </span>
+        <div className="flex h-16 items-center px-5 border-b border-gray-200 dark:border-gray-800">
+          <Logo />
         </div>
 
         {/* User info */}

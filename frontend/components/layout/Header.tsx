@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Compass, Camera, BookOpen, Menu, X, User, LogOut, Settings, LayoutDashboard, Download } from 'lucide-react';
-import { Emblem } from '@/components/Emblem';
+import { Logo } from '@/components/Logo';
 import { cn } from '@/lib/utils';
 import { getStoredUser, signOut } from '@/lib/auth';
 import type { User as UserType } from '@/lib/types';
@@ -43,15 +43,7 @@ export function Header() {
       <div className="container mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-brand text-cream">
-              <Emblem className="h-6 w-6" />
-            </div>
-            <span className="hidden sm:block font-display font-semibold text-xl text-ink">
-              Photo<span className="text-gold-500">Video</span>
-              <span className="text-ink-300">.ae</span>
-            </span>
-          </Link>
+          <Logo hideTextOnMobile />
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1">
