@@ -1056,14 +1056,20 @@ def _check_rate_limit(ip: str) -> bool:
 
 _proxy_blocked_until: dict[str, float] = {}  # proxy -> unblock timestamp
 
-def _get_proxy() -> str | None:
+def _proxy_pool() -> list[str]:
     raw = os.environ.get("YTDLP_PROXIES", os.environ.get("YTDLP_PROXY", ""))
-    pool = [p.strip() for p in raw.split(",") if p.strip()]
+    return [p.strip() for p in raw.split(",") if p.strip()]
+
+def _get_proxy(exclude=()) -> str | None:
+    pool = _proxy_pool()
     if not pool:
         return None
     now = time.time()
-    available = [p for p in pool if _proxy_blocked_until.get(p, 0) < now]
-    return random.choice(available) if available else random.choice(pool)
+    available = [p for p in pool if _proxy_blocked_until.get(p, 0) < now and p not in exclude]
+    if available:
+        return random.choice(available)
+    fallback = [p for p in pool if p not in exclude]
+    return random.choice(fallback) if fallback else None
 
 def _block_proxy(proxy: str, seconds: int = 3600):
     if proxy:
@@ -1131,12 +1137,11 @@ async def _process(
         job_dir = DOWNLOADS_DIR / job_id
         job_dir.mkdir(exist_ok=True)
 
-        cmd = [
+        base_cmd = [
             "yt-dlp", "--no-playlist",
-            # tv_embedded больше не поддерживается. default = актуальный набор клиентов,
-            # который yt-dlp сам подстраивает под изменения YouTube.
+            # default = актуальный набор клиентов, который yt-dlp сам подстраивает.
             "--extractor-args", "youtube:player_client=default",
-            # PO-token берётся автоматически у сервиса bgutil-provider (без аккаунта и cookies).
+            # PO-token берётся у bgutil-provider (без аккаунта и cookies).
             "--extractor-args", "youtubepot-bgutilhttp:base_url=http://bgutil-provider:4416",
             "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
             "--merge-output-format", "mp4",
@@ -1144,52 +1149,70 @@ async def _process(
             "-o", str(job_dir / "%(title)s.%(ext)s"),
             "--print", "after_move:filepath",
         ]
-        proxy = _get_proxy()
-        if proxy:
-            cmd += ["--proxy", proxy]
-        # БЕЗ аккаунта: для публичных видео cookies НЕ нужны (хватает PO-token + visitor_data).
-        # Cookies подключаем ТОЛЬКО если намеренно примонтирован свежий файл ОДНОРАЗОВОГО
-        # аккаунта в /cookies/youtube-cookies.txt. Старый /app/cookies.txt больше не используем.
+        # Optional one-shot account cookies (mounted at /cookies/youtube-cookies.txt).
+        cookies_args = []
         for cookies_src in (Path("/cookies/youtube-cookies.txt"),):
             if cookies_src.exists():
                 import shutil
                 tmp_cookies = job_dir / "cookies.txt"
                 shutil.copy(cookies_src, tmp_cookies)
-                cmd += ["--cookies", str(tmp_cookies)]
+                cookies_args = ["--cookies", str(tmp_cookies)]
                 break
-        cmd.append(url)
 
-        proc = await asyncio.create_subprocess_exec(
-            *cmd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-
-        progress_task = asyncio.create_task(_read_progress(proc.stderr, job_id))
-        stdout_data = await proc.stdout.read()
-        await proc.wait()
-        await progress_task
-
-        if proc.returncode != 0:
-            stderr_lines = jobs[job_id].get("_stderr", [])
-            stderr_text = " ".join(stderr_lines)
-            stderr_tail = " | ".join(l for l in stderr_lines[-5:] if l)
-            if "rate-limited" in stderr_text or "ratelimit" in stderr_text.lower():
-                _block_proxy(proxy, 3600)
-                msg = "YouTube has rate-limited this server. Please try again in 30–60 minutes."
-            elif "Sign in to confirm" in stderr_text or "bot" in stderr_text.lower():
-                _block_proxy(proxy, 3600)
-                msg = "YouTube is blocking downloads from this server IP. Please try again in 1–2 hours."
-            elif "Video unavailable" in stderr_text or "not available" in stderr_text.lower():
-                msg = "Video unavailable (private, deleted or geo-blocked)."
-            elif "cookies" in stderr_text.lower() and "no longer valid" in stderr_text.lower():
-                msg = "Download error — YouTube session expired. Try again in a few minutes."
-            elif "HTTP Error 403" in stderr_text:
+        # Retry across the proxy pool. Many datacenter IPs are flagged by YouTube
+        # ("not a bot"), so one bad proxy must not fail the whole job — rotate to a
+        # different proxy and retry. Failed proxies are sidelined for a while.
+        pool = _proxy_pool()
+        max_attempts = max(1, min(len(pool) or 1, 6))
+        RETRYABLE = ("sign in to confirm", "not a bot", "http error 403",
+                     "http error 429", "rate-limited", "ratelimit")
+        tried: set[str] = set()
+        stdout_data = b""
+        stderr_text = ""
+        stderr_tail = ""
+        ok = False
+        for attempt in range(max_attempts):
+            proxy = _get_proxy(exclude=tried)
+            if proxy:
+                tried.add(proxy)
+            cmd = base_cmd + cookies_args + (["--proxy", proxy] if proxy else []) + [url]
+            jobs[job_id]["_stderr"] = []
+            proc = await asyncio.create_subprocess_exec(
+                *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
+            )
+            progress_task = asyncio.create_task(_read_progress(proc.stderr, job_id))
+            stdout_data = await proc.stdout.read()
+            await proc.wait()
+            await progress_task
+            if proc.returncode == 0:
+                ok = True
+                break
+            lines = jobs[job_id].get("_stderr", [])
+            stderr_text = " ".join(lines)
+            stderr_tail = " | ".join(l for l in lines[-5:] if l)
+            low = stderr_text.lower()
+            if proxy and any(s in low for s in RETRYABLE) and attempt < max_attempts - 1:
                 _block_proxy(proxy, 1800)
+                jobs[job_id].update({
+                    "status": "downloading", "step": "fetching", "step_progress": 0,
+                    "progress": 3, "message": "Finding a working route...",
+                    "detail": f"attempt {attempt + 2}/{max_attempts}",
+                })
+                continue
+            break
+
+        if not ok:
+            low = stderr_text.lower()
+            if "rate-limited" in low or "ratelimit" in low:
+                msg = "YouTube has rate-limited us. Please try again in a few minutes."
+            elif "sign in to confirm" in low or "not a bot" in low:
+                msg = "All routes are busy right now. Please try again in a few minutes."
+            elif "video unavailable" in low or "not available" in low:
+                msg = "Video unavailable (private, deleted or geo-blocked)."
+            elif "http error 403" in low:
                 msg = "YouTube blocked the download (403). Please try again in a few minutes."
-            elif "HTTP Error 429" in stderr_text:
-                _block_proxy(proxy, 3600)
-                msg = "Too many requests — YouTube has rate-limited this server. Try again in 1 hour."
+            elif "http error 429" in low:
+                msg = "Too many requests — please try again later."
             else:
                 msg = f"Download error: {stderr_tail}" if stderr_tail else "Download error. Check the URL."
             jobs[job_id].update({"status": "error", "message": msg})
