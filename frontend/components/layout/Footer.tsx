@@ -70,8 +70,14 @@ export function Footer() {
           <p className="text-sm text-ink-400">
             © {new Date().getFullYear()} PhotoVideo.ae. All rights reserved.
           </p>
-          <p className="text-xs text-ink-400">
+          <p className="flex items-center gap-1.5 text-xs text-ink-400">
             Made with care for creators in the UAE
+            <svg viewBox="0 0 24 12" role="img" aria-label="UAE flag" className="h-3 w-6 rounded-[2px] ring-1 ring-white/10">
+              <rect width="24" height="12" fill="#fff" />
+              <rect x="6" width="18" height="4" fill="#00732f" />
+              <rect x="6" y="8" width="18" height="4" fill="#000" />
+              <rect width="6" height="12" fill="#ff0000" />
+            </svg>
           </p>
         </div>
       </div>
