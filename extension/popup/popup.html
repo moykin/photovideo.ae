@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="popup.css" />
+    <title>PhotoVideo.ae Saver</title>
+  </head>
+  <body>
+    <header class="brand">
+      <span class="tile"><img src="../icons/icon-48.png" alt="" /></span>
+      <span class="word">Photo<b>Video</b>.ae <em>Saver</em></span>
+    </header>
+
+    <main>
+      <label class="lbl" for="url">Video link</label>
+      <input id="url" type="text" placeholder="Paste a YouTube link…" autocomplete="off" />
+
+      <div class="row">
+        <button id="device" class="btn primary">⤓ Download</button>
+        <button id="drive" class="btn ghost">☁ Save to Drive</button>
+      </div>
+
+      <div id="status" class="status hidden">
+        <div id="title" class="title"></div>
+        <div class="bar"><div id="fill" class="fill"></div></div>
+        <div id="msg" class="msg"></div>
+        <a id="link" class="link hidden" target="_blank" rel="noopener">Open in Google Drive →</a>
+      </div>
+
+      <details class="settings">
+        <summary>Google Drive setup</summary>
+        <p class="hint">
+          For “Save to Drive”, paste your Google OAuth <b>Client ID</b> (Web application). Add this
+          redirect URI to it: <code id="redir">loading…</code>
+        </p>
+        <input id="clientId" type="text" placeholder="xxxx.apps.googleusercontent.com" />
+        <button id="saveCid" class="btn small">Save</button>
+        <span id="cidOk" class="ok hidden">✓ saved</span>
+      </details>
+
+      <p class="foot">Extraction runs in your browser, on your own IP. No server, no proxy.</p>
+    </main>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

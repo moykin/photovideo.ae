@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "PhotoVideo.ae Saver",
+  "version": "0.1.0",
+  "description": "Save YouTube videos to your device or Google Drive — extraction runs in YOUR browser, on YOUR IP. No server, no proxy.",
+  "permissions": ["downloads", "storage", "identity"],
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "*://*.googlevideo.com/*",
+    "https://www.googleapis.com/*",
+    "https://photovideo.ae/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "PhotoVideo.ae Saver",
+    "default_icon": {
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png",
+    "256": "icons/icon-256.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://photovideo.ae/*"],
+      "js": ["content/bridge.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "saver@photovideo.ae",
+      "strict_min_version": "121.0"
+    }
+  }
+}

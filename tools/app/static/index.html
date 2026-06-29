@@ -1633,6 +1633,11 @@ async function go() {
   btn.innerHTML = '<div class="spinner"></div>';
   document.getElementById('rbox').style.display = 'none';
   showSteps({ status: 'pending', step: 'fetching', step_progress: 0, progress: 2 });
+
+  // Prefer the browser extension: extraction runs on the USER's IP (not the
+  // blocked server). Falls back to the server only when the extension is absent.
+  if (extPresent()) { showGame(); goViaExtension(url); return; }
+
   const body = { url, action: mode, provider };
   const res = await fetch(ROOT+'/api/start', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
@@ -1662,6 +1667,74 @@ async function poll() {
     else if (j.status === 'done') { clearInterval(pollTimer); showDone(j); resetBtn(); loadHistory(); }
     else if (j.status === 'error') { clearInterval(pollTimer); showErr(j.message); resetBtn(); }
   } catch (_) {}
+}
+
+// ── Browser-extension path (extraction on the USER's IP) ───────────────────────
+function extPresent() { return !!document.documentElement.dataset.pvSaver; }
+
+let extListener = null;
+function goViaExtension(url) {
+  if (extListener) window.removeEventListener('message', extListener);
+  const info = {};
+  extListener = (e) => {
+    if (e.source !== window) return;
+    const d = e.data;
+    if (!d || d.source !== 'pv-saver-bg') return;
+    handleExtMsg(d, info);
+  };
+  window.addEventListener('message', extListener);
+  window.postMessage({ source: 'pv-saver', type: 'download', url, mode: mode === 'cloud' ? 'drive' : 'device' }, '*');
+}
+
+function extDone() { if (extListener) { window.removeEventListener('message', extListener); extListener = null; } }
+
+function handleExtMsg(d, info) {
+  if (d.kind === 'info') { info.title = d.title; info.filename = d.filename; return; }
+  if (d.kind === 'log') { showSteps({ status: 'pending', step: 'fetching', progress: 6, detail: d.message }); return; }
+  if (d.kind === 'progress') {
+    const map = { extracting: 'fetching', downloading: 'downloading', authorizing: 'connecting', uploading: 'uploading' };
+    const step = map[d.step] || 'fetching';
+    const pct = d.pct || 0;
+    let overall = 8;
+    if (step === 'downloading') overall = 10 + pct * (mode === 'cloud' ? 0.4 : 0.85);
+    else if (step === 'connecting') overall = 55;
+    else if (step === 'uploading') overall = 55 + pct * 0.45;
+    showSteps({ status: step === 'fetching' ? 'pending' : 'downloading', step, step_progress: pct, progress: Math.round(overall) });
+    return;
+  }
+  if (d.kind === 'done') {
+    extDone();
+    if (d.mode === 'drive') showDoneExt(info, d.link); else showReadyDevice(info);
+    resetBtn();
+    return;
+  }
+  if (d.kind === 'error') { extDone(); showErr(d.message); resetBtn(); return; }
+}
+
+function showReadyDevice(info) {
+  const t = T[currentLang];
+  const fill = document.getElementById('ofill'); if (fill) { fill.style.width = '100%'; fill.className = 'overall-fill done'; }
+  const b = document.getElementById('rbox'); b.style.display = 'block';
+  b.innerHTML = `<div class="result-inner ok">
+    <div class="ri-icon">✅</div>
+    <div class="ri-name">${esc(info.filename || 'video.mp4')}</div>
+    <div class="sdetail" style="text-align:center;margin:6px 0 2px">Saved to your device ✓ (via your browser, your IP)</div>
+    <div class="ri-actions" style="margin-top:10px">
+      <button class="btn-again" onclick="reset()">${esc(t.anotherVideo)}</button>
+    </div></div>`;
+}
+
+function showDoneExt(info, link) {
+  const t = T[currentLang];
+  const fill = document.getElementById('ofill'); if (fill) { fill.style.width = '100%'; fill.className = 'overall-fill done'; }
+  const b = document.getElementById('rbox'); b.style.display = 'block';
+  b.innerHTML = `<div class="result-inner ok">
+    <div class="ri-icon">☁</div>
+    <div class="ri-name">${esc(info.filename || 'video.mp4')}</div>
+    <div class="ri-actions">
+      ${link ? `<a href="${esc(link)}" target="_blank" class="btn-cl">${esc(t.openInDrive)}</a>` : ''}
+      <button class="btn-again" onclick="reset()">${esc(t.anotherVideo)}</button>
+    </div></div>`;
 }
 
 // ── Steps ─────────────────────────────────────────────────────────────────────
