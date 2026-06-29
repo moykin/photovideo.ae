@@ -67,11 +67,26 @@ services:
       - HTTP_PROXY=socks5://xray-client:1080
       - HTTPS_PROXY=socks5://xray-client:1080
       - ALL_PROXY=socks5://xray-client:1080
+      # внутренние запросы к PO-token провайдеру НЕ гнать через прокси
+      - NO_PROXY=bgutil-provider,localhost,127.0.0.1
+      - no_proxy=bgutil-provider,localhost,127.0.0.1
     ports:
       - '8080:8080'
     volumes:
       - ./tools/app:/app
       - ~/.config/yt-dlp:/cookies:ro
+    depends_on:
+      - bgutil-provider
+
+  # PO-token провайдер: генерит ГОСТЕВОЙ токен YouTube БЕЗ аккаунта и cookies.
+  # yt-dlp (плагин bgutil) сам берёт токен по http://bgutil-provider:4416.
+  bgutil-provider:
+    image: brainicism/bgutil-ytdlp-pot-provider
+    container_name: photovideo_bgutil
+    init: true
+    restart: unless-stopped
+    expose:
+      - '4416'
 
   xray-client:
     image: teddysun/xray:latest

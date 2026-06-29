@@ -1068,7 +1068,11 @@ async def _process(
 
         cmd = [
             "yt-dlp", "--no-playlist",
-            "--extractor-args", "youtube:player_client=tv_embedded,web",
+            # tv_embedded больше не поддерживается. default = актуальный набор клиентов,
+            # который yt-dlp сам подстраивает под изменения YouTube.
+            "--extractor-args", "youtube:player_client=default",
+            # PO-token берётся автоматически у сервиса bgutil-provider (без аккаунта и cookies).
+            "--extractor-args", "youtubepot-bgutilhttp:base_url=http://bgutil-provider:4416",
             "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
             "--merge-output-format", "mp4",
             "--add-header", "Accept-Language:en-US,en;q=0.9",
@@ -1078,7 +1082,10 @@ async def _process(
         proxy = _get_proxy()
         if proxy:
             cmd += ["--proxy", proxy]
-        for cookies_src in (Path("/cookies/youtube-cookies.txt"), Path("/app/cookies.txt")):
+        # БЕЗ аккаунта: для публичных видео cookies НЕ нужны (хватает PO-token + visitor_data).
+        # Cookies подключаем ТОЛЬКО если намеренно примонтирован свежий файл ОДНОРАЗОВОГО
+        # аккаунта в /cookies/youtube-cookies.txt. Старый /app/cookies.txt больше не используем.
+        for cookies_src in (Path("/cookies/youtube-cookies.txt"),):
             if cookies_src.exists():
                 import shutil
                 tmp_cookies = job_dir / "cookies.txt"

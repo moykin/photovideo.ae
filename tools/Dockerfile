@@ -1,16 +1,20 @@
 FROM python:3.12-slim
 
+# Deno — JS-движок. ОБЯЗАТЕЛЕН: yt-dlp решает им YouTube JS-challenge.
+# Без него: "n challenge solving failed" -> "No video formats found".
+COPY --from=denoland/deno:bin /deno /usr/local/bin/deno
+
 # ffmpeg нужен yt-dlp для склейки видео+аудио
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg wget ca-certificates fonts-dejavu-core \
-    && wget -q -O /usr/local/bin/yt-dlp \
-       https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
-    && chmod +x /usr/local/bin/yt-dlp \
+    ffmpeg ca-certificates fonts-dejavu-core \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# yt-dlp ставим через pip — так автоматически подхватывается плагин PO-token.
+# bgutil-ytdlp-pot-provider (плагин-клиент): yt-dlp сам берёт PO-token у сервиса bgutil-provider.
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir -U "yt-dlp>=2025.05.22" bgutil-ytdlp-pot-provider
 
 COPY app/ .
 

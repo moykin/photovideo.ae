@@ -60,6 +60,18 @@ services:
       - '127.0.0.1:8080:8080'
     volumes:
       - /root/.config/yt-dlp:/cookies:ro
+    depends_on:
+      - bgutil-provider
+
+  # PO-token провайдер: гостевой токен YouTube БЕЗ аккаунта и cookies.
+  # yt-dlp (плагин bgutil) берёт токен по http://bgutil-provider:4416.
+  bgutil-provider:
+    image: brainicism/bgutil-ytdlp-pot-provider
+    container_name: photovideo_bgutil
+    init: true
+    restart: always
+    expose:
+      - '4416'
 
 volumes:
   postgres_data:
