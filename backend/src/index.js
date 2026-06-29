@@ -88,6 +88,16 @@ module.exports = {
       const pub = await grant('public', PUBLIC_ACTIONS);
       const auth = await grant('authenticated', AUTH_ACTIONS);
       strapi.log.info(`[bootstrap] permissions seeded — public:+${pub}, authenticated:+${auth}`);
+
+      // Reset-password email link must point at the frontend page (not the Strapi admin).
+      const upStore = strapi.store({ type: 'plugin', name: 'users-permissions' });
+      const advanced = (await upStore.get({ key: 'advanced' })) || {};
+      const resetUrl = 'https://photovideo.ae/auth/reset-password';
+      if (advanced.email_reset_password !== resetUrl) {
+        advanced.email_reset_password = resetUrl;
+        await upStore.set({ key: 'advanced', value: advanced });
+        strapi.log.info('[bootstrap] reset-password URL -> ' + resetUrl);
+      }
     } catch (e) {
       strapi.log.error('[bootstrap] permission seeding failed: ' + (e && e.message));
     }

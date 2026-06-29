@@ -200,6 +200,16 @@ export async function register(data: {
   return res.data;
 }
 
+export async function forgotPassword(email: string) {
+  const res = await strapi.post('/auth/forgot-password', { email });
+  return res.data;
+}
+
+export async function resetPassword(code: string, password: string, passwordConfirmation: string) {
+  const res = await strapi.post('/auth/reset-password', { code, password, passwordConfirmation });
+  return res.data;
+}
+
 export async function updateMe(data: Record<string, unknown>, userId?: number) {
   // PUT /users/me требует разрешение updateMe в Strapi Admin.
   // Используем PUT /users/:id — требует только разрешение update,
