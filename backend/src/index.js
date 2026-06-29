@@ -98,6 +98,24 @@ module.exports = {
         await upStore.set({ key: 'advanced', value: advanced });
         strapi.log.info('[bootstrap] reset-password URL -> ' + resetUrl);
       }
+
+      // Email templates default sender to no-reply@strapi.io, which our SMTP
+      // rejects ("Sender address rejected"). Force our own verified sender.
+      const fromAddr = { name: 'PhotoVideo.ae', email: 'no-reply@photovideo.ae' };
+      const emailTpl = (await upStore.get({ key: 'email' })) || {};
+      let tplChanged = false;
+      for (const key of ['reset_password', 'email_confirmation']) {
+        const tpl = emailTpl[key];
+        if (tpl && tpl.options && (!tpl.options.from || tpl.options.from.email !== fromAddr.email)) {
+          tpl.options.from = { ...fromAddr };
+          tpl.options.response_email = fromAddr.email;
+          tplChanged = true;
+        }
+      }
+      if (tplChanged) {
+        await upStore.set({ key: 'email', value: emailTpl });
+        strapi.log.info('[bootstrap] email sender -> ' + fromAddr.email);
+      }
     } catch (e) {
       strapi.log.error('[bootstrap] permission seeding failed: ' + (e && e.message));
     }
