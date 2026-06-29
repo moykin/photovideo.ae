@@ -1,11 +1,11 @@
 FROM node:20
 WORKDIR /app
 RUN apt-get update && apt-get install -y python3 make g++ libssl-dev && rm -rf /var/lib/apt/lists/*
-COPY package*.json ./
-# npm ci из lock + ЯВНО ставим Linux-бинарник @swc (его npm пропускает, т.к. lock
-# сгенерён на macOS -> "Failed to load native binding" при strapi build).
-RUN npm ci \
-    && npm install --no-save "@swc/core-linux-x64-gnu@$(node -p "require('@swc/core/package.json').version")"
+COPY package.json ./
+# ВАЖНО: НЕ копируем package-lock.json — он сгенерён на macOS, и с ним npm пропускает
+# Linux-бинарник @swc/core-linux-x64-gnu ("Failed to load native binding" при strapi build).
+# Без lock npm резолвит зависимости свежо под Linux и ставит нужный бинарник (проверено).
+RUN npm install --include=optional
 COPY . .
 EXPOSE 1337
 ENV NODE_ENV=production
