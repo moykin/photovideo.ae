@@ -620,11 +620,11 @@ def _article_html(lang: str, article: dict) -> str:
     hreflangs += f'\n<link rel="alternate" hreflang="x-default" href="{BASE_URL}/article/en/{slug}">'
     other_articles = [a for a in ARTICLES[lang] if a['id'] != article['id']]
     related_html = ''.join(
-        f'<a href="{BASE_URL}/article/{lang}/{ARTICLE_SLUGS[a["id"]]}" class="rel-link">{a["title"]}</a>'
+        f'<a href="{BASE_URL}/article/{lang}/{ARTICLE_SLUGS[a["id"]]}" class="rel-link"><span class="rel-t">{a["title"]}</span><span class="arr">&#8594;</span></a>'
         for a in other_articles
     )
     lang_links = ''.join(
-        f'<a href="{BASE_URL}/article/{l}/{slug}" class="lnk-l{"active" if l==lang else ""}"><span class="lnk-flag">{LANG_FLAGS[l]}</span>{LANG_NAMES[l]}</a>'
+        f'<a href="{BASE_URL}/article/{l}/{slug}" class="lnk-l{" lnk-active" if l==lang else ""}"><span class="lnk-flag">{LANG_FLAGS[l]}</span>{LANG_NAMES[l]}</a>'
         for l in ARTICLES
     )
     dir_attr = LANG_DIRS.get(lang, 'ltr')
@@ -656,74 +656,139 @@ def _article_html(lang: str, article: dict) -> str:
 <meta name="twitter:description" content="{article['description']}">
 <meta name="twitter:image" content="{BASE_URL}/og-image.png">
 <script type="application/ld+json">{json_ld}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
-:root{{--bg:#0d0f18;--s1:#161924;--s2:#1e2130;--border:#2a3050;--text:#e2e6f3;--muted:#7a82a0;--accent:#4f8ef7;--r:12px}}
-body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0 0 60px}}
-header{{background:var(--s1);border-bottom:1px solid var(--border);padding:0 16px}}
-.hdr{{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}}
-.logo{{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:700;font-size:1rem}}
-.logo-icon{{width:32px;height:32px;background:#4f8ef7;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem}}
-.back{{color:var(--accent);text-decoration:none;font-size:.85rem}}
-.back:hover{{text-decoration:underline}}
-main{{max-width:760px;margin:0 auto;padding:32px 16px}}
-h1{{font-size:1.7rem;font-weight:700;margin-bottom:12px;line-height:1.3}}
-.desc{{color:var(--muted);margin-bottom:28px;font-size:.95rem;line-height:1.6}}
-.art-body{{font-size:.93rem;line-height:1.7;color:#c8cde0}}
-.art-body h2{{font-size:1.1rem;font-weight:600;color:var(--text);margin:24px 0 10px}}
-.art-body p{{margin-bottom:12px}}
-.art-body ol,.art-body ul{{margin:10px 0 10px 20px}}
-.art-body li{{margin-bottom:6px}}
-.art-body dl{{margin:10px 0}}
-.art-body dt{{font-weight:600;color:var(--text);margin-top:10px}}
-.art-body dd{{margin-left:16px;color:var(--muted);margin-bottom:4px}}
-.art-body strong{{color:var(--text)}}
-.art-body a{{color:var(--accent);text-decoration:none}}
-.art-body a:hover{{text-decoration:underline}}
-[dir="rtl"] .art-body ol,[dir="rtl"] .art-body ul{{margin:10px 20px 10px 0}}
-.langs{{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 24px;padding:3px 2px}}
-.lnk-l{{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-size:.82rem;background:var(--s2);color:var(--muted);text-decoration:none;border:1px solid var(--border);transition:background .15s,color .15s,border-color .15s}}
-.lnk-lactive{{background:var(--accent);color:#fff;border-color:#6aa3ff;font-weight:600;box-shadow:0 0 0 3px rgba(79,142,247,.22)}}
-.lnk-l:hover:not(.lnk-lactive){{background:var(--s1);color:var(--text);border-color:#3a4570}}
-.lnk-flag{{font-size:1rem;line-height:1}}
-.lang-label{{font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}}
-.related{{margin-top:36px;padding-top:24px;border-top:1px solid var(--border)}}
-.related h3{{font-size:.85rem;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em}}
-.rel-link{{display:block;color:var(--accent);text-decoration:none;font-size:.9rem;margin-bottom:8px}}
-.rel-link:hover{{text-decoration:underline}}
-.cta{{display:inline-block;margin-top:28px;padding:12px 24px;background:var(--accent);color:#fff;border-radius:var(--r);text-decoration:none;font-weight:600;font-size:.95rem}}
-.cta:hover{{opacity:.9}}
-.disclaimer{{display:flex;gap:14px;background:rgba(122,130,160,.06);border:1px solid rgba(42,48,80,.9);border-left:3px solid rgba(122,130,160,.35);border-radius:10px;padding:16px;margin-top:32px;font-size:.81rem;line-height:1.65;color:var(--muted)}}
-.disc-icon{{font-size:1.3rem;flex-shrink:0;margin-top:1px}}
-.disclaimer strong{{color:var(--text);display:block;margin-bottom:5px;font-size:.85rem}}
-#lang-banner{{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px;background:#1a2540;border-bottom:1px solid #2e4080;padding:10px 16px;font-size:.85rem;flex-wrap:wrap}}
-#lang-banner a{{color:#7eb3ff;font-weight:600;text-decoration:none;padding:4px 10px;background:rgba(79,142,247,.15);border-radius:6px;border:1px solid rgba(79,142,247,.3)}}
-#lang-banner a:hover{{background:rgba(79,142,247,.25)}}
-#lang-banner button{{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:2px 6px;border-radius:4px}}
-#lang-banner button:hover{{color:var(--text)}}
+:root{{--bg:#fbf8f2;--s1:#ffffff;--s2:#f7f1e6;--s3:#efe6d2;--border:#e7e0d2;--ink:#221c15;--text:#3a332a;--muted:#6e6557;--gold:#b68a3e;--gold-d:#8a6326;--gold-l:#d8b978;--r:14px;--display:'Cormorant Garamond',Georgia,serif}}
+body{{font-family:'Plus Jakarta Sans',-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased}}
+::selection{{background:var(--gold-l);color:var(--ink)}}
+/* nav */
+header.site{{position:sticky;top:0;z-index:50;background:rgba(251,248,242,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}}
+.nav{{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:22px;height:66px;padding:0 20px}}
+.brand{{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-size:1.1rem}}
+.brand .ico{{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--gold-l),var(--gold));display:flex;align-items:center;justify-content:center;color:#fff;font-size:.95rem}}
+.brand b{{font-family:var(--display);font-weight:700;font-size:1.25rem}}
+.brand b i{{color:var(--gold);font-style:normal}}
+.nav-links{{display:flex;gap:24px;margin-left:6px}}
+.nav-links a{{color:var(--muted);text-decoration:none;font-size:.9rem;font-weight:500}}
+.nav-links a:hover{{color:var(--ink)}}
+.nav-cta{{margin-left:auto}}
+.btn{{display:inline-flex;align-items:center;gap:8px;border-radius:999px;font-weight:600;text-decoration:none;cursor:pointer;transition:all .16s;border:none;white-space:nowrap}}
+.btn-gold{{background:var(--gold);color:#fff;padding:10px 20px;font-size:.9rem;box-shadow:0 4px 14px rgba(182,138,62,.28)}}
+.btn-gold:hover{{background:var(--gold-d);transform:translateY(-1px)}}
+.btn-lg{{padding:15px 30px;font-size:1.02rem}}
+@media(max-width:780px){{.nav-links{{display:none}}}}
+/* layout */
+main{{max-width:760px;margin:0 auto;padding:40px 20px 90px}}
+.crumb{{font-size:.8rem;color:var(--muted);margin-bottom:16px}}
+.crumb a{{color:var(--muted);text-decoration:none}}
+.crumb a:hover{{color:var(--gold-d)}}
+h1{{font-family:var(--display);font-size:clamp(2.1rem,5.5vw,3rem);font-weight:600;line-height:1.1;color:var(--ink);letter-spacing:-.01em;margin-bottom:14px}}
+.desc{{color:var(--muted);font-size:1.08rem;line-height:1.6;margin-bottom:26px;max-width:640px}}
+/* top hero CTA */
+.tophero{{display:flex;flex-wrap:wrap;align-items:center;gap:18px;background:linear-gradient(135deg,#fffdf8,var(--s2));border:1px solid var(--border);border-radius:18px;padding:22px 24px;margin-bottom:24px;box-shadow:0 12px 34px rgba(34,28,21,.05)}}
+.tophero .th-txt{{flex:1;min-width:210px}}
+.tophero .th-txt b{{display:block;font-family:var(--display);color:var(--ink);font-weight:600;font-size:1.45rem;line-height:1.15;margin-bottom:4px}}
+.tophero .th-txt span{{color:var(--muted);font-size:.9rem}}
+/* trust pills */
+.trust{{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 30px}}
+.trust .pill{{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:500;color:var(--muted);background:var(--s1);border:1px solid var(--border);border-radius:999px;padding:7px 14px}}
+.trust .pill b{{color:var(--gold);font-weight:700}}
+/* language selector */
+.lang-label{{font-size:.74rem;font-weight:700;color:var(--gold-d);text-transform:uppercase;letter-spacing:.09em;margin-bottom:11px}}
+.langs{{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 38px}}
+.lnk-l{{display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:999px;font-size:.86rem;font-weight:500;background:var(--s1);color:var(--muted);text-decoration:none;border:1px solid var(--border);transition:all .15s}}
+.lnk-l:hover{{border-color:var(--gold-l);color:var(--ink);transform:translateY(-1px)}}
+.lnk-l.lnk-active{{background:var(--ink);color:#f4ecda;border-color:var(--ink);font-weight:600}}
+.lnk-flag{{font-size:1.05rem;line-height:1}}
+/* article body */
+.art-body{{font-size:1.04rem;line-height:1.78;color:var(--text)}}
+.art-body h2{{font-family:var(--display);font-size:1.7rem;font-weight:600;color:var(--ink);margin:38px 0 12px;letter-spacing:-.01em}}
+.art-body h3{{font-size:1.14rem;font-weight:700;color:var(--ink);margin:26px 0 8px}}
+.art-body p{{margin-bottom:15px}}
+.art-body ol,.art-body ul{{margin:12px 0 16px 22px}}
+.art-body li{{margin-bottom:9px}}
+.art-body dl{{margin:16px 0;border-top:1px solid var(--border);padding-top:6px}}
+.art-body dt{{font-weight:700;color:var(--ink);margin-top:15px}}
+.art-body dd{{margin-left:0;color:var(--muted);margin-bottom:9px}}
+.art-body strong{{color:var(--ink);font-weight:600}}
+.art-body a{{color:var(--gold-d);text-decoration:underline;text-underline-offset:2px}}
+[dir="rtl"] .art-body ol,[dir="rtl"] .art-body ul{{margin:12px 22px 16px 0}}
+/* disclaimer */
+.disclaimer{{display:flex;gap:14px;background:var(--s2);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:12px;padding:18px 20px;margin:36px 0;font-size:.87rem;line-height:1.65;color:var(--muted)}}
+.disc-icon{{font-size:1.3rem;flex-shrink:0}}
+.disclaimer strong{{color:var(--ink);display:block;margin-bottom:5px;font-size:.93rem}}
+/* bottom CTA card */
+.cta-card{{background:radial-gradient(120% 140% at 0% 0%,#2c2519,var(--ink));border-radius:22px;padding:42px 32px;text-align:center;margin:46px 0 54px;color:#f4ecda}}
+.cta-card .eyebrow{{font-size:.74rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-l);margin-bottom:12px}}
+.cta-card h3{{font-family:var(--display);font-size:2.1rem;font-weight:600;color:#fff;margin-bottom:10px;line-height:1.12}}
+.cta-card p{{color:#cabfa9;font-size:.97rem;margin:0 auto 24px;max-width:460px}}
+.cta-card .btn-gold{{box-shadow:0 10px 28px rgba(182,138,62,.45)}}
+.cta-card .sub{{margin-top:15px;font-size:.78rem;color:#9a917f}}
+/* more guides cards */
+.related{{margin-top:54px;padding-top:32px;border-top:1px solid var(--border)}}
+.related .rh{{font-family:var(--display);font-size:1.55rem;font-weight:600;color:var(--ink);margin-bottom:4px}}
+.related .rsub{{color:var(--muted);font-size:.9rem;margin-bottom:22px}}
+.rel-grid{{display:grid;grid-template-columns:1fr 1fr;gap:12px}}
+@media(max-width:640px){{.rel-grid{{grid-template-columns:1fr}}}}
+.rel-link{{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--s1);border:1px solid var(--border);border-radius:13px;padding:16px 17px;color:var(--ink);text-decoration:none;font-size:.93rem;font-weight:500;line-height:1.4;transition:all .16s}}
+.rel-link:hover{{border-color:var(--gold-l);box-shadow:0 8px 22px rgba(34,28,21,.07);transform:translateY(-2px)}}
+.rel-link .arr{{color:var(--gold);font-size:1.15rem;flex-shrink:0;transition:transform .16s}}
+.rel-link:hover .arr{{transform:translateX(3px)}}
+/* lang banner */
+#lang-banner{{position:sticky;top:66px;z-index:40;display:flex;align-items:center;gap:10px;background:var(--ink);color:#f4ecda;padding:11px 16px;font-size:.85rem;flex-wrap:wrap}}
+#lang-banner a{{color:var(--gold-l);font-weight:600;text-decoration:none;padding:5px 13px;background:rgba(216,185,120,.13);border-radius:999px;border:1px solid rgba(216,185,120,.32)}}
+#lang-banner a:hover{{background:rgba(216,185,120,.24)}}
+#lang-banner button{{margin-left:auto;background:none;border:none;color:#9a917f;cursor:pointer;font-size:1rem;padding:2px 6px}}
+#lang-banner button:hover{{color:#fff}}
 </style>
 </head>
 <body>
-<header>
-  <div class="hdr">
-    <a href="{BASE_URL}" class="logo"><span class="logo-icon">▶</span> YT2GDrive</a>
-    <a href="{BASE_URL}" class="back">← Back to Downloader</a>
-  </div>
+<header class="site">
+  <nav class="nav">
+    <a href="{BASE_URL}" class="brand"><span class="ico">&#9654;</span> <b>YT2G<i>Drive</i></b></a>
+    <div class="nav-links">
+      <a href="https://photovideo.ae/">Home</a>
+      <a href="{BASE_URL}">Downloader</a>
+      <a href="https://photovideo.ae/photographers">Photographers</a>
+    </div>
+    <div class="nav-cta"><a href="{BASE_URL}" class="btn btn-gold">&#11015; Try the downloader</a></div>
+  </nav>
 </header>
 <main>
+  <div class="crumb"><a href="{BASE_URL}">Downloader</a> &#8250; Guides</div>
   <h1>{article['title']}</h1>
   <p class="desc">{article['description']}</p>
-  <div class="lang-label">Read in your language</div>
+  <div class="tophero">
+    <div class="th-txt"><b>Download this video now</b><span>Paste any link &middot; save MP4 or to Google Drive &middot; free, no signup</span></div>
+    <a href="{BASE_URL}" class="btn btn-gold btn-lg">&#11015; Try the downloader</a>
+  </div>
+  <div class="trust">
+    <span class="pill"><b>&#10003;</b> Google-verified</span>
+    <span class="pill"><b>&#10003;</b> No registration</span>
+    <span class="pill"><b>&#10003;</b> HD &amp; 4K</span>
+    <span class="pill"><b>&#10003;</b> 1000+ sites</span>
+  </div>
+  <div class="lang-label">&#127760; Read in your language</div>
   <div class="langs">{lang_links}</div>
   <div class="art-body">{article['body']}</div>
   <div class="disclaimer">
-    <span class="disc-icon">⚖️</span>
+    <span class="disc-icon">&#9878;</span>
     <div><strong>{disc_title}</strong>{disc_body}</div>
   </div>
-  <a href="{BASE_URL}" class="cta">⬇ Try the Downloader</a>
+  <div class="cta-card">
+    <div class="eyebrow">Ready when you are</div>
+    <h3>Save your video in seconds</h3>
+    <p>YT2GDrive downloads from YouTube, Instagram, TikTok and 1000+ sites — straight to your device or Google Drive. Free, no account, no watermark.</p>
+    <a href="{BASE_URL}" class="btn btn-gold btn-lg">&#11015; Try the downloader free</a>
+    <div class="sub">No signup &middot; No watermark &middot; Up to 4K</div>
+  </div>
   <div class="related">
-    <h3>More Guides</h3>
-    {related_html}
+    <div class="rh">More guides</div>
+    <div class="rsub">Step-by-step tutorials for every platform.</div>
+    <div class="rel-grid">{related_html}</div>
   </div>
 </main>
 <script>
