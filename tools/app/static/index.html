@@ -35,15 +35,19 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"YouTube Video Downloader","url":"https://photovideo.ae/download","description":"Free YouTube video downloader. Download videos in HD to your computer or save directly to Google Drive.","applicationCategory":"MultimediaApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How to download a YouTube video?","acceptedAnswer":{"@type":"Answer","text":"Paste the YouTube video URL into the input field, click Download Now, wait for processing, then click the Download button to save the MP4 file."}},{"@type":"Question","name":"How to save a YouTube video to Google Drive?","acceptedAnswer":{"@type":"Answer","text":"Paste the YouTube URL, switch to Save to Cloud tab, connect your Google Drive account, choose a destination folder, and click Save to Google Drive."}},{"@type":"Question","name":"Is it free to download YouTube videos?","acceptedAnswer":{"@type":"Answer","text":"Yes, completely free with no limits or registration required."}}]}]}
 </script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #0d0f18; --s1: #161924; --s2: #1e2130; --s3: #262b3d;
-  --border: #2a3050; --text: #e2e6f3; --muted: #7a82a0;
-  --accent: #4f8ef7; --green: #34c77b; --red: #f75151; --r: 12px;
+  --bg: #fbf8f2; --s1: #ffffff; --s2: #f7f1e6; --s3: #efe6d2;
+  --border: #e7e0d2; --text: #221c15; --muted: #6e6557;
+  --accent: #b68a3e; --green: #4f9d69; --red: #c0473a; --r: 14px;
+  --display: 'Cormorant Garamond', Georgia, serif;
 }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   background: var(--bg); color: var(--text);
   min-height: 100vh; display: flex; flex-direction: column; align-items: center;
   padding: 0 0 80px;
@@ -59,8 +63,8 @@ header {
 .logo { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
 .logo-icon {
   width: 30px; height: 30px;
-  background: linear-gradient(135deg,#4f8ef7,#34c77b);
-  border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: .85rem;
+  background: linear-gradient(135deg,#d8b978,#b68a3e);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: .85rem; color: #fff;
 }
 .hdr-right { display: flex; align-items: center; gap: 10px; }
 .user-chip { display: flex; align-items: center; gap: 8px; font-size: .82rem; color: var(--muted); }
@@ -94,8 +98,9 @@ header {
   width: 100%; max-width: 760px; padding: 40px 16px 28px; text-align: center;
 }
 .hero h1 {
-  font-size: clamp(1.5rem, 4vw, 2.1rem); font-weight: 800; line-height: 1.25;
-  margin-bottom: 14px; letter-spacing: -.02em;
+  font-family: var(--display);
+  font-size: clamp(2rem, 5vw, 3rem); font-weight: 600; line-height: 1.15;
+  margin-bottom: 14px; letter-spacing: -.01em; color: var(--text);
 }
 .hero-sub { font-size: .95rem; color: var(--muted); max-width: 520px; margin: 0 auto 20px; line-height: 1.6; }
 .features { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
@@ -103,15 +108,15 @@ header {
   background: var(--s2); border: 1px solid var(--border);
   border-radius: 100px; padding: 5px 14px; font-size: .8rem; color: var(--muted);
 }
-.art-card-pro { border-color:rgba(79,142,247,.3); background:linear-gradient(135deg,var(--s1),rgba(79,142,247,.05)); }
+.art-card-pro { border-color:rgba(182,138,62,.3); background:linear-gradient(135deg,var(--s1),rgba(182,138,62,.05)); }
 .pro-banner {
   display:flex;align-items:center;gap:12px;margin:18px auto 0;padding:12px 18px;
-  background:linear-gradient(135deg,rgba(79,142,247,.12),rgba(168,85,247,.1));
-  border:1px solid rgba(79,142,247,.35);border-radius:12px;
+  background:linear-gradient(135deg,rgba(182,138,62,.12),rgba(182,138,62,.1));
+  border:1px solid rgba(182,138,62,.35);border-radius:12px;
   text-decoration:none;color:var(--text);max-width:520px;width:100%;
   transition:border-color .2s,background .2s;
 }
-.pro-banner:hover { border-color:rgba(79,142,247,.7);background:linear-gradient(135deg,rgba(79,142,247,.2),rgba(168,85,247,.16)); }
+.pro-banner:hover { border-color:rgba(182,138,62,.7);background:linear-gradient(135deg,rgba(182,138,62,.2),rgba(182,138,62,.16)); }
 .pro-icon { font-size:1.4rem;flex-shrink:0; }
 .pro-text { flex:1;text-align:left; }
 .pro-text strong { display:block;font-size:.85rem;color:var(--text);margin-bottom:2px; }
@@ -120,7 +125,7 @@ header {
 /* Main card */
 .card {
   background: var(--s1); border: 1px solid var(--border); border-radius: var(--r);
-  padding: 24px; width: 100%; max-width: 620px; box-shadow: 0 4px 32px rgba(0,0,0,.4);
+  padding: 24px; width: 100%; max-width: 620px; box-shadow: 0 10px 40px rgba(34,28,21,.08);
 }
 .input-label { font-size: .75rem; font-weight: 600; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
 .url-wrap { position: relative; margin-bottom: 6px; }
@@ -161,7 +166,7 @@ header {
   padding: 14px 10px; cursor: pointer; transition: all .15s; text-align: center; position: relative;
 }
 .pcard:hover:not(.disabled) { border-color: var(--accent); }
-.pcard.sel { border-color: var(--accent); background: rgba(79,142,247,.08); }
+.pcard.sel { border-color: var(--accent); background: rgba(182,138,62,.08); }
 .pcard.disabled { opacity: .45; cursor: not-allowed; }
 .pcard-icon { font-size: 1.5rem; margin-bottom: 6px; display: flex; justify-content: center; }
 .pcard-name { font-size: .78rem; font-weight: 600; }
@@ -197,10 +202,10 @@ header {
 .btn-main {
   width: 100%; padding: 13px; border-radius: 10px; border: none;
   font-size: .97rem; font-weight: 600; cursor: pointer;
-  background: linear-gradient(135deg,#4f8ef7,#3a7af0); color: #fff;
+  background: linear-gradient(135deg,#b68a3e,#8a6326); color: #fff;
   transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.btn-main:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(79,142,247,.4); }
+.btn-main:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(182,138,62,.4); }
 .btn-main:active { transform: none; }
 .btn-main:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
 /* Games */
@@ -221,13 +226,13 @@ header {
 /* Steps */
 .steps-wrap { margin-top: 22px; display: none; }
 .overall-bar { height: 4px; background: var(--s2); border-radius: 100px; margin-bottom: 18px; overflow: hidden; }
-.overall-fill { height: 100%; border-radius: 100px; min-width: 4px; background: linear-gradient(90deg,#4f8ef7,#6ec6ff); transition: width .5s ease; }
+.overall-fill { height: 100%; border-radius: 100px; min-width: 4px; background: linear-gradient(90deg,#b68a3e,#d8b978); transition: width .5s ease; }
 .overall-fill.done { background: var(--green); }
 .overall-fill.err { background: var(--red); }
 .sitem { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--s2); }
 .sitem:last-child { border-bottom: none; }
 .sitem-ico { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-.sitem-spin { width: 15px; height: 15px; border: 2px solid rgba(79,142,247,.25); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+.sitem-spin { width: 15px; height: 15px; border: 2px solid rgba(182,138,62,.25); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
 .sbody { flex: 1; min-width: 0; }
 .slabel { font-size: .88rem; font-weight: 500; line-height: 1.4; }
 .sitem-done .slabel { color: var(--muted); }
@@ -247,7 +252,7 @@ header {
 .btn-dl { background: var(--green); color: #fff; border: none; padding: 9px 18px; border-radius: 8px; font-size: .85rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
 .btn-dl:hover { background: #2ab36a; }
 .btn-cl { background: var(--accent); color: #fff; border: none; padding: 9px 18px; border-radius: 8px; font-size: .85rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
-.btn-cl:hover { background: #3a7af0; }
+.btn-cl:hover { background: #8a6326; }
 .btn-again { background: var(--s3); color: var(--text); border: none; padding: 9px 18px; border-radius: 8px; font-size: .85rem; cursor: pointer; }
 .btn-again:hover { background: var(--border); }
 .err-text { color: var(--red); font-size: .85rem; line-height: 1.5; }
@@ -275,7 +280,7 @@ header {
   padding: 18px 20px 16px; display: flex; flex-direction: column; overflow: hidden;
   transition: border-color .2s, box-shadow .2s;
 }
-.art-card:hover { border-color: rgba(79,142,247,.4); box-shadow: 0 4px 20px rgba(0,0,0,.3); }
+.art-card:hover { border-color: rgba(182,138,62,.4); box-shadow: 0 4px 20px rgba(0,0,0,.3); }
 .art-card-wide { grid-column: 1 / -1; flex-direction: row; gap: 20px; align-items: flex-start; }
 @media(max-width:560px){ .art-card-wide { flex-direction: column; } }
 .art-card-wide .art-wide-body { flex: 1; display: flex; flex-direction: column; }
@@ -288,7 +293,7 @@ header {
 .art-cat-tt  { background: rgba(105,201,208,.12); color: #69c9d0; border: 1px solid rgba(105,201,208,.25); }
 .art-cat-ig  { background: rgba(225,48,108,.12); color: #f06292; border: 1px solid rgba(225,48,108,.25); }
 .art-cat-gen { background: rgba(52,199,123,.12); color: #34c77b; border: 1px solid rgba(52,199,123,.25); }
-.art-cat-pro { background: rgba(79,142,247,.15); color: #7ab4ff; border: 1px solid rgba(79,142,247,.3); }
+.art-cat-pro { background: rgba(182,138,62,.15); color: #7ab4ff; border: 1px solid rgba(182,138,62,.3); }
 .art-card h2 { font-size: .95rem; font-weight: 700; margin-bottom: 7px; color: var(--text); line-height: 1.35; }
 .art-summary { font-size: .82rem; color: var(--muted); margin-bottom: 0; line-height: 1.55; flex: 1; }
 .art-body {
@@ -1329,7 +1334,7 @@ function selectProv(p) { if (p !== 'google') return; provider = p; }
     ctx.fillStyle='#f75151';
     ctx.beginPath(); ctx.arc(food.x*cl+cl/2, food.y*cl+cl/2, cl*.38, 0, Math.PI*2); ctx.fill();
     snake.forEach((s,i) => {
-      ctx.fillStyle = i===0 ? '#4f8ef7' : `rgba(52,199,123,${Math.max(.3,1-i*.04)})`;
+      ctx.fillStyle = i===0 ? '#b68a3e' : `rgba(52,199,123,${Math.max(.3,1-i*.04)})`;
       rr(ctx, s.x*cl+1, s.y*cl+1, cl-2, cl-2, 3);
     });
     ctx.textAlign='center'; ctx.textBaseline='middle';
@@ -1337,7 +1342,7 @@ function selectProv(p) { if (p !== 'google') return; provider = p; }
       ctx.fillStyle='rgba(13,15,24,.7)'; ctx.fillRect(0,0,sz,sz);
       ctx.fillStyle='#e2e6f3'; ctx.font=`bold ${cl+2}px system-ui`;
       ctx.fillText('🎮 Snake', sz/2, sz/2-cl*1.5);
-      ctx.fillStyle='#4f8ef7'; ctx.font=`${cl}px system-ui`;
+      ctx.fillStyle='#b68a3e'; ctx.font=`${cl}px system-ui`;
       ctx.fillText('Press any arrow to start', sz/2, sz/2);
       ctx.fillStyle='#7a82a0'; ctx.font=`${cl-2}px system-ui`;
       ctx.fillText('or tap a button below', sz/2, sz/2+cl*1.6);
@@ -1348,7 +1353,7 @@ function selectProv(p) { if (p !== 'google') return; provider = p; }
       ctx.fillText('Game Over', sz/2, sz/2-cl*1.2);
       ctx.fillStyle='#7a82a0'; ctx.font=`${cl}px system-ui`;
       ctx.fillText('Score: '+score, sz/2, sz/2+cl*.2);
-      ctx.fillStyle='#4f8ef7'; ctx.font=`${cl-1}px system-ui`;
+      ctx.fillStyle='#b68a3e'; ctx.font=`${cl-1}px system-ui`;
       ctx.fillText('Tap any button to restart', sz/2, sz/2+cl*2);
     }
   }
@@ -1527,7 +1532,7 @@ function switchGame(game) {
     draw();
   }
 
-  const COLORS = ['','#4f8ef7','#34c77b','#f75151','#7c4dff','#f7a31c','#00bcd4','#e91e63','#607d8b'];
+  const COLORS = ['','#b68a3e','#34c77b','#f75151','#7c4dff','#f7a31c','#00bcd4','#e91e63','#607d8b'];
 
   function draw() {
     const c = document.getElementById('mscanvas');
@@ -1551,7 +1556,7 @@ function switchGame(game) {
           }
         } else if (flagged[r][cc]) {
           ctx.fillStyle='#1a2240'; ctx.fillRect(x,y,cw,ch);
-          ctx.strokeStyle='rgba(79,142,247,.4)'; ctx.lineWidth=.5; ctx.strokeRect(x,y,cw,ch);
+          ctx.strokeStyle='rgba(182,138,62,.4)'; ctx.lineWidth=.5; ctx.strokeRect(x,y,cw,ch);
           ctx.font=`${Math.floor(cw*.6)}px system-ui`; ctx.textAlign='center'; ctx.textBaseline='middle';
           ctx.fillText('🚩',x+cw/2,y+ch/2);
         } else {
